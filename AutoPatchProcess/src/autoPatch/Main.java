@@ -24,9 +24,10 @@ public class Main {
 	String topDirectory = "C:\\Users\\sure\\CTcode\\engine";
 
     try {
-        processor.preprocess(topDirectory);
-        List<CMakePreproccesor.CMakeContents> allResults = preprocessor.getAllResults();
-    	parser.parseCMakeFile(allResults, utils, topDirectory, modules);
+    	CMakeContents root = processor.preprocess(topDirectory);
+//        List<CMakePreproccesor.CMakeContents> allResults = preprocessor.preprocess();
+        
+    	parser.parseCMakeFile(root, utils, topDirectory, modules);
         System.out.println("성공적으로 완료.");
 //        System.out.println(allContents.path);
     } catch (Exception e) {

@@ -1,49 +1,72 @@
 package autoPatch;
-import autoPatch.Utils;
-import autoPatch.CMakePreproccesor.CMakeContents;
-
-import java.util.ArrayList;
+import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
+
+import autoPatch.CMakePreproccesor.CMakeContents;
 
 public class CMakeParser {
 	
 // 최상위 CMakeLists.txt 파일로부터 시작해 subdirectory 탐색
-	public void parseCMakeFile(List<CMakePreproccesor.CMakeContents> allResults, Utils utils, String directoryPath, List<Module> modules) {		
+	public void parseCMakeFile(CMakeContents root, Utils utils, String directoryPath, List<Module> modules) {		
 //		C:\Users\sure\CTcode\engine		
-		Stack<String> directories = new Stack<>();
-		Set<String> visited = new HashSet<>();
+//		Stack<String> directories = new Stack<>();
+//		Set<String> visited = new HashSet<>();
+//		
+//		directories.push(directoryPath);
+//		visited.add(directoryPath);
 		
-		directories.push(directoryPath);
-		visited.add(directoryPath);
-		
-		for (CMakeContents result : allResults) {
-			String currentDirectory = result.path;
-			File cmakeFile = new File(currentDirectory + "\\CMakeLists.txt");
-			
-			if (!cmakeFile.exists()) {
-	            System.out.println("파일 존재x : " + currentDirectory + "\\CMakeLists.txt");
-	            continue;
-	        }
-			
-			processCMakeFile(result, utils, cmakeFile, currentDirectory, directories, visited, modules);
-
-		}
+//	    public void parseCMakeFile(Utils utils, String directoryPath, List<Module> modules) {
+//	        // 최상위 CMakeContents 객체를 생성해야 할 경우, 예시:
+//	        CMakeContents root = loadCMakeFile(directoryPath); // loadCMakeFile은 CMakeContents를 생성하는 가상의 함수
+//
+//	        // root부터 모든 CMakeContents 객체를 순회하며 processCMakeFile을 실행
+//	        traverseAndProcess(root, utils, modules);
+//	    }
+//
+//	    // 재귀적으로 CMakeContents 순회하며 processCMakeFile 실행하는 메서드
+//	    private void traverseAndProcess(CMakeContents cmakeContents, Utils utils, List<Module> modules) {
+//	        // 현재 CMakeContents에 대해 processCMakeFile 함수 실행
+//	        processCMakeFile(cmakeContents, utils, modules);
+//
+//	        // 하위 children 리스트가 있을 경우 재귀적으로 순회
+//	        for (CMakeContents child : cmakeContents.children) {
+//	            traverseAndProcess(child, utils, modules);
+//	        }
+//	    }
+		File cmakeFile = new File(root.path + "\\CMakeLists.txt");
+		recurseProcess(root, utils, cmakeFile, modules);
+//		for (CMakeContents result : allResults) {
+//			String currentDirectory = result.path;
+//			File cmakeFile = new File(currentDirectory + "\\CMakeLists.txt");
+//			
+//			if (!cmakeFile.exists()) {
+//	            System.out.println("파일 존재x : " + currentDirectory + "\\CMakeLists.txt");
+//	            continue;
+//	        }
+//			
+//			processCMakeFile(result, utils, cmakeFile, currentDirectory, directories, visited, modules);
+//
+//		}
 		
 	}
+
+	private void recurseProcess(CMakeContents cmakeContents, Utils utils, File cmakeFile, List<Module> modules) {
+		
+	    // 현재 CMakeContents에 대해 processCMakeFile 함수 실행
+	    processCMakeFile(cmakeContents, utils, cmakeFile, modules);
 	
-	private void processCMakeFile(CMakeContents result, Utils utils, File cmakeFile, String currentDirectory, Stack<String> directories, Set<String> visited, List<Module> modules) {
+	    // 하위 children 리스트가 있을 경우 재귀적으로 순회
+	    for (CMakeContents child : cmakeContents.children) {
+	    	recurseProcess(child, utils, cmakeFile, modules);
+	    }
+	}
+	
+	
+	private void processCMakeFile(CMakeContents result, Utils utils, File cmakeFile, List<Module> modules) {
         StringBuilder moduleNameBuilder = new StringBuilder();
         
         for (String line : result.contents) {
