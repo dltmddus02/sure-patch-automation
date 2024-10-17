@@ -295,7 +295,34 @@ public class CMakePreproccesor {
 			return path;
 		}
 		
-		List<String> replaceMacro(List<String> statements) {
+		
+		String replaceMacro(String statement) {
+			String line = statement.trim();
+//			${...} 형태 매크로 치환하는 함수
+	        if (!line.contains("${") || !line.contains("}")) {
+	            return line;
+	        }
+			
+			Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
+			Matcher matcher = pattern.matcher(line);
+			StringBuffer result = new StringBuffer();
+			
+	        while (matcher.find()) {
+	            String macroName = matcher.group(1);
+	            String macroValue = macros.find(macroName);
+	            
+	            if (macroValue == null) {
+	                macroValue = matcher.group(0);
+	            }
+	            macroValue = Matcher.quoteReplacement(macroValue);
+	            matcher.appendReplacement(result, macroValue);
+	        }
+	        matcher.appendTail(result); // 한 문장에 매크로 두 개일 수 있음
+			return line;
+		}
+		
+
+		List<String> replaceMacros(List<String> statements) {
 			List<String> replacedStatements = new ArrayList<>();
 			
 			for (String line : statements) {
@@ -334,7 +361,6 @@ public class CMakePreproccesor {
 			return replacedStatements;
 		}
 		
-		
 		CMakeContents preprocess(String cMakeListPath) throws IOException {
 			CMakeContents result = new CMakeContents();
 			List<String> replacedStatements = new ArrayList<>();
@@ -342,12 +368,16 @@ public class CMakePreproccesor {
 			try {
 				List<String> lines = read(cMakeListPath);
 				List<String> statements = makeStatements(lines);
+				
+				List<String> resultReplaceMacro = new ArrayList<>();
 				macros.push();
 				macros = setDefaultMacros(macros);
 				result.setPath(cMakeListPath);
 //				System.out.println("현재경로 : " + result.path);
 				for ( String statement : statements ) {					
 
+					resultReplaceMacro.add(replaceMacro(statement));
+					
 					if ( isSetMacro(statement) ) {
 						Macro macro = getMacro(statement);
 						macros.add(macro);
@@ -367,15 +397,13 @@ public class CMakePreproccesor {
 				}
 				
 //				macros.showMacros();
-				replacedStatements = replaceMacro(statements);
-//				System.out.println("replacedState : " + replacedStatements);
+				replacedStatements = replaceMacros(resultReplaceMacro);
 				macros.pop();
-
+				
 				result.setContent(replacedStatements);
-//				result.showChildPath();
 
 				allResults.add(result);
-//				for(String s : replacedStatements) {
+//				for(String s : resultReplaceMacro) {
 //					System.out.println(s);
 //				}
 			} catch(Exception e) {

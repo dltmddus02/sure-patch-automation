@@ -75,9 +75,9 @@ public class CMakeParser {
         String[] moduleNameString = moduleNameBuilder.toString().split(" ");
         String finalModuleName = moduleNameString[0].trim();
 
-//	    System.out.println(currentDirectory + "\\" + ": 현재 위치");
-//	    System.out.println(line + ": 현재 위치");
-//      System.out.println("모듈이름 : " + finalModuleName);
+	    System.out.println(cmakeFile.getPath() + ": 현재 위치");
+//	    System.out.println(line + ": 현재 위치");S
+	    System.out.println("모듈이름 : " + finalModuleName);
         
         String outputType = "EXE";
         utils.extractModuleInfo(new StringBuilder(finalModuleName), outputType, cmakeFile, modules);
