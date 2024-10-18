@@ -222,7 +222,7 @@ public class CMakePreproccesor {
 		}
 
 		boolean isSetMacro(String line) { // 매크로를 정의하는 줄이냐? set()이 있는가?
-			Pattern setPattern = Pattern.compile("set\\(.*\\)");
+			Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);
 			line = line.trim();
 			Matcher matcher = setPattern.matcher(line);
 

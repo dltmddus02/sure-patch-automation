@@ -109,6 +109,8 @@ public class Utils {
 //			}
 //		}
 //  }
+	
+
   
 // 참조 모듈 추출
 	public void extractLinkedModules(Module module, File cmakeFile) {
@@ -116,7 +118,10 @@ public class Utils {
 //	  참조 모듈 추출하는 코드 작성
 //	  module.outputType이 exe / dll 인 경우에 한해 target_link_libraries 확인
 		if (module.outputType == "EXE" || module.outputType == "SHARED") {
-//			System.out.println("이름 : " + module.moduleName);
+			System.out.println(cmakeFile.getPath());
+			System.out.println("이름 : " + module.moduleName);
+	        
+
 //			target_link_libraries() 이용
 //			어떻게 모듈 저장해올건지
 //			for () {
@@ -129,6 +134,8 @@ public class Utils {
 	public void extractModuleInfo(StringBuilder moduleName, String outputType, File cmakeFile, List<Module> modules) {
 //		add_library, add_executable이면 소스 파일 정보를 츄츌해 Module 객체 생성
 //		한 줄씩 읽어 명령을 찾아 모듈을 생성하고 modules 리스트에 추가		
+
+		
 		Module module = new Module(moduleName, outputType);
 		
 //		extractSourceFile(module, cmakeFile);

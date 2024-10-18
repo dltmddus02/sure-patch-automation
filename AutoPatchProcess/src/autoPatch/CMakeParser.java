@@ -1,57 +1,17 @@
 package autoPatch;
 import java.io.File;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import autoPatch.CMakePreproccesor.CMakeContents;
 
 public class CMakeParser {
 	
 // 최상위 CMakeLists.txt 파일로부터 시작해 subdirectory 탐색
-	public void parseCMakeFile(CMakeContents root, Utils utils, String directoryPath, List<Module> modules) {		
-//		C:\Users\sure\CTcode\engine		
-//		Stack<String> directories = new Stack<>();
-//		Set<String> visited = new HashSet<>();
-//		
-//		directories.push(directoryPath);
-//		visited.add(directoryPath);
-		
-//	    public void parseCMakeFile(Utils utils, String directoryPath, List<Module> modules) {
-//	        // 최상위 CMakeContents 객체를 생성해야 할 경우, 예시:
-//	        CMakeContents root = loadCMakeFile(directoryPath); // loadCMakeFile은 CMakeContents를 생성하는 가상의 함수
-//
-//	        // root부터 모든 CMakeContents 객체를 순회하며 processCMakeFile을 실행
-//	        traverseAndProcess(root, utils, modules);
-//	    }
-//
-//	    // 재귀적으로 CMakeContents 순회하며 processCMakeFile 실행하는 메서드
-//	    private void traverseAndProcess(CMakeContents cmakeContents, Utils utils, List<Module> modules) {
-//	        // 현재 CMakeContents에 대해 processCMakeFile 함수 실행
-//	        processCMakeFile(cmakeContents, utils, modules);
-//
-//	        // 하위 children 리스트가 있을 경우 재귀적으로 순회
-//	        for (CMakeContents child : cmakeContents.children) {
-//	            traverseAndProcess(child, utils, modules);
-//	        }
-//	    }
+	public void parseCMakeFile(CMakeContents root, Utils utils, List<Module> modules) {		
 		File cmakeFile = new File(root.path + "\\CMakeLists.txt");
-		recurseProcess(root, utils, cmakeFile, modules);
-//		for (CMakeContents result : allResults) {
-//			String currentDirectory = result.path;
-//			File cmakeFile = new File(currentDirectory + "\\CMakeLists.txt");
-//			
-//			if (!cmakeFile.exists()) {
-//	            System.out.println("파일 존재x : " + currentDirectory + "\\CMakeLists.txt");
-//	            continue;
-//	        }
-//			
-//			processCMakeFile(result, utils, cmakeFile, currentDirectory, directories, visited, modules);
-//
-//		}
-		
+		recurseProcess(root, utils, cmakeFile, modules);		
 	}
 
 	private void recurseProcess(CMakeContents cmakeContents, Utils utils, File cmakeFile, List<Module> modules) {
@@ -72,14 +32,13 @@ public class CMakeParser {
         StringBuilder moduleNameBuilder = new StringBuilder();
         
         for (String line : result.contents) {
-//    	    System.out.println(line);                	    
 //	        1. add_executable
         	if (isAddExecutableLine(line)) {
         		processAddExecutable(utils, line, moduleNameBuilder, cmakeFile, modules);
-//            	System.out.println(line);                	    
         	}
-//	            2. add_library
-            else if (line.contains("add_library")) {
+//	        2. add_library
+            else if (isAddLibraryLine(line)) {
+//            	System.out.println("AddLibrary : " + line);
             	processAddLibrary(utils, line, moduleNameBuilder, cmakeFile, modules);
             }                    
         }
@@ -90,20 +49,28 @@ public class CMakeParser {
 	    return line.contains("add_executable");
 	}
 	
+	private boolean isAddLibraryLine(String line) {
+	    return line.contains("add_library");
+	}
+	
+	private String deleteQuote(String moduleName) {
+		return moduleName.substring(1, moduleName.length() - 1);
+	}
+
+
 	private void processAddExecutable(Utils utils, String line, StringBuilder moduleNameBuilder, File cmakeFile, List<Module> modules) {
-//    	System.out.println("add_Exe: " + line);
-    	
         int startIndex = line.indexOf('(') + 1;
         int endIndex = line.indexOf(')');
         moduleNameBuilder.append(line.substring(startIndex, endIndex).trim());
 
         String[] moduleNameString = moduleNameBuilder.toString().split(" ");
         String finalModuleName = moduleNameString[0].trim();
-
-	    System.out.println(cmakeFile.getPath() + ": 현재 위치");
-//	    System.out.println(line + ": 현재 위치");S
-	    System.out.println("모듈이름 : " + finalModuleName);
         
+
+//	    System.out.println("현재위치 : " + cmakeFile.getPath());
+//	    System.out.println("모듈이름 : " + finalModuleName);
+//	    System.out.println(" ");
+	    
         String outputType = "EXE";
         utils.extractModuleInfo(new StringBuilder(finalModuleName), outputType, cmakeFile, modules);
         
@@ -111,11 +78,28 @@ public class CMakeParser {
 	}
 	
 	private void processAddLibrary(Utils utils, String line, StringBuilder moduleNameBuilder, File cmakeFile, List<Module> modules) {
-	    String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "";
-	    utils.extractModuleInfo(moduleNameBuilder, outputType, cmakeFile, modules);
+        int startIndex = line.indexOf('(') + 1;
+        int endIndex = line.indexOf(')');
+        moduleNameBuilder.append(line.substring(startIndex, endIndex).trim());
+
+        String[] moduleNameString = moduleNameBuilder.toString().split(" ");
+        String finalModuleName = moduleNameString[0].trim();
+
+//	    System.out.println("현재위치 : " + cmakeFile.getPath());
+//	    System.out.println("모듈이름 : " + finalModuleName);
+//	    System.out.println(" ");
+	    
+		
+	    if(finalModuleName.startsWith("\"")) {
+    	finalModuleName = deleteQuote(finalModuleName);
+    }
+
+		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "";
+	    utils.extractModuleInfo(new StringBuilder(finalModuleName), outputType, cmakeFile, modules);
 	}
 	
 	
+
 //	모듈 순회하며 모듈 간의 참조+의존성 저장하는 함수
 	public void findDependencies(List<String> input, Set<Module> output, List<Module> modules) {		
 		for (String mf : input) {
