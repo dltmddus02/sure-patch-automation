@@ -1,44 +1,25 @@
 package autoPatch;
 
-import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 import java.util.Stack;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CMakePreproccesor {
-
-	List<CMakeContents> allResults; // 모든 CMakeContents를 저장하는 리스트
-
-	public CMakePreproccesor() {
-		this.allResults = new ArrayList<>();
-	}
-
-	public List<CMakeContents> getAllResults() {
-		return this.allResults;
-	}
 
 	class CMakeContents { // 매크로 치환한 txt 저장하는 클래스
 		List<String> contents;
 		List<CMakeContents> children;
 		String path; // 현재 경로
-		List<String> childrenPaths; // child들 경로
 
 		public CMakeContents() {
 			this.contents = new ArrayList<>();
 			this.children = new ArrayList<>();
-//	        this.path = new String;
-			this.childrenPaths = new ArrayList<>();
 		}
 
 		public void setContent(List<String> content) {
@@ -53,20 +34,6 @@ public class CMakePreproccesor {
 			this.path = cMakeListPath;
 		}
 
-		public void addChildPath(String path) {
-			this.childrenPaths.add(path);
-		}
-
-		public void showChildPath() {
-			if (this.childrenPaths.size() == 0)
-				return;
-			int index = 1;
-			System.out.println("children들의 경로 from " + this.path);
-			for (String path : this.childrenPaths) {
-				System.out.println(index + " : " + path);
-				index++;
-			}
-		}
 	}
 
 	class Macro {
@@ -375,9 +342,6 @@ public class CMakePreproccesor {
 				for (String statement : statements) {
 						
 					resultReplaceMacro.add(replaceMacro(statement));
-//					if(result.path.contains("POCO_LIB")) {
-//						System.out.println(replaceMacro(statement));
-//					}
 
 					if (isSetMacro(statement)) {
 						Macro macro = getMacro(statement);
@@ -389,20 +353,17 @@ public class CMakePreproccesor {
 						macros.add(macro);
 					}
 					if (isAddSubDirectory(statement)) {
-//						System.out.println(statement);
 						String path = getCmakePath(cMakeListPath, statement);
-						result.addChildPath(path);
 						CMakeContents subResult = preprocess(path);
 						result.addChild(subResult);
 //						System.out.println(result.path);
 	
 					}
 				}
-				if(result.path.contains("POCO_LIB\\Foundation\\")) {
-				System.out.println(cMakeListPath);
-					
-				macros.showMacros();
-			}
+//				if(result.path.contains("POCO_LIB\\Foundation\\")) {
+//				System.out.println(cMakeListPath);
+//				macros.showMacros();
+//			}
 
 //				macros.showMacros();
 				replacedStatements = replaceMacros(resultReplaceMacro);
