@@ -61,7 +61,9 @@ public class CMakeParser {
 	
 	    // 하위 children 리스트가 있을 경우 재귀적으로 순회
 	    for (CMakeContents child : cmakeContents.children) {
-	    	recurseProcess(child, utils, cmakeFile, modules);
+	    	String currentDirectory = child.path;
+	    	File currentCMakeFile = new File(currentDirectory);
+	    	recurseProcess(child, utils, currentCMakeFile, modules);
 	    }
 	}
 	

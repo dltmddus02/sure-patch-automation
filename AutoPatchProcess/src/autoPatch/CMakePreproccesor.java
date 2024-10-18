@@ -318,7 +318,7 @@ public class CMakePreproccesor {
 				matcher.appendReplacement(result, macroValue);
 			}
 			matcher.appendTail(result); // 한 문장에 매크로 두 개일 수 있음
-			return line;
+			return result.toString();
 		}
 
 		List<String> replaceMacros(List<String> statements) {
@@ -373,8 +373,11 @@ public class CMakePreproccesor {
 				result.setPath(cMakeListPath);
 //				System.out.println("현재경로 : " + result.path);
 				for (String statement : statements) {
-
+						
 					resultReplaceMacro.add(replaceMacro(statement));
+//					if(result.path.contains("POCO_LIB")) {
+//						System.out.println(replaceMacro(statement));
+//					}
 
 					if (isSetMacro(statement)) {
 						Macro macro = getMacro(statement);
@@ -391,8 +394,15 @@ public class CMakePreproccesor {
 						result.addChildPath(path);
 						CMakeContents subResult = preprocess(path);
 						result.addChild(subResult);
+//						System.out.println(result.path);
+	
 					}
 				}
+				if(result.path.contains("POCO_LIB\\Foundation\\")) {
+				System.out.println(cMakeListPath);
+					
+				macros.showMacros();
+			}
 
 //				macros.showMacros();
 				replacedStatements = replaceMacros(resultReplaceMacro);
@@ -400,7 +410,7 @@ public class CMakePreproccesor {
 
 				result.setContent(replacedStatements);
 
-				allResults.add(result);
+//				allResults.add(result);
 //				for(String s : replacedStatements) {
 //					System.out.println(s);
 //				}
