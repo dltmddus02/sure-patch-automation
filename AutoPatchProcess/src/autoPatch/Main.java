@@ -1,30 +1,30 @@
 package autoPatch;
-import autoPatch.Module;
-import autoPatch.CMakeParser;
-import autoPatch.Utils;
-import autoPatch.CMakePreproccesor;
-import autoPatch.CMakePreproccesor.CMakeContents;
-import autoPatch.CMakePreproccesor.Preproccesor;
-
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
+
+import autoPatch.CMakeParser.Parser;
+import autoPatch.CMakePreproccesor.CMakeContents;
+import autoPatch.CMakePreproccesor.Preproccesor;
 
 
 public class Main {
     public static void main(String[] args) {
-		CMakeParser parser = new CMakeParser();
-	    CMakePreproccesor preprocessor = new CMakePreproccesor();
-	    Preproccesor processor = preprocessor.new Preproccesor();
+    	
+		CMakeParser cmakeParser = new CMakeParser();
+		Parser parser = cmakeParser.new Parser();
+		
+	    CMakePreproccesor cmakePreprocessor = new CMakePreproccesor();
+	    Preproccesor preprocessor = cmakePreprocessor.new Preproccesor();
+	    
 		Utils utils = new Utils();
+		
 		List<Module> modules = new ArrayList<>(); // 결과 모듈 정보들 저장할 리스트
-	
 		String topDirectory = "C:\\Users\\sure\\CTcode\\engine";
 	
 	    try {
-	    	CMakeContents root = processor.preprocess(topDirectory);
+	    	CMakeContents root = preprocessor.preprocess(topDirectory);
 	    	parser.parseCMakeFile(root, utils, modules);
 	        System.out.println("성공적으로 완료.");
 	    } catch (Exception e) {

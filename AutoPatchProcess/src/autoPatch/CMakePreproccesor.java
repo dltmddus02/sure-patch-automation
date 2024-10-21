@@ -172,9 +172,8 @@ public class CMakePreproccesor {
 				Macro macro = new Macro();
 				macro.key = matcher.group(1);
 				String macroValue = matcher.group(2);
-
-				if (macroValue.startsWith("\"") && macroValue.endsWith("\"")) {
-					macroValue = macroValue.substring(1, macroValue.length() - 1);
+				if (macroValue.contains("\"")) {
+				    macroValue = macroValue.replaceAll("\"", "");
 				}
 
 				macro.value = macroValue;
