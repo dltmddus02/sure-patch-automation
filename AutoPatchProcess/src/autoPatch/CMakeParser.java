@@ -250,6 +250,7 @@ public class CMakeParser {
     	    	            	String affectedModuleName = affactedModuleNameString[i].trim();
 	    	            		if(affectedModuleName.equals("ucommon")) {
 //	        	            		System.out.println("일치함");
+		    	            		if(m.affectedModules.contains("ucommon")) continue;
 	        	            		m.addAffectedModule("ucommon");
 	    	            		}
     	    	            }
