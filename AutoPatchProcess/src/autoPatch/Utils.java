@@ -5,10 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import autoPatch.CMakePreproccesor.CMakeContents;
 
 public class Utils {
 	public String getNextLine(BufferedReader reader) throws IOException {
@@ -77,7 +73,7 @@ public class Utils {
         		}
 	        }
 	    } catch (FileNotFoundException e) {
-	        System.out.println("CMake 파일을 찾을 수 없다 : " + cmakeFile.getPath());
+	        System.out.println("CMake 일을 찾을 수 없다 : " + cmakeFile.getPath());
 	    } catch (IOException e) {
 	        System.out.println("CMake 파일을 읽는 중 오류 발생 : " + e.getMessage());
 	    }

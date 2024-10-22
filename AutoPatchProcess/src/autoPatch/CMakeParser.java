@@ -55,10 +55,19 @@ public class CMakeParser {
 //			this.conditions = new Conditions();
 //			this.conditions.data = new Stack<>();
 //		}
-// 최상위 CMakeLists.txt 파일로부터 시작해 subdirectory 탐색
 		public void parseCMakeFile(CMakeContents root, Utils utils, List<Module> modules) {		
 			File cmakeFile = new File(root.path + "\\CMakeLists.txt");
 			recurseProcess(root, utils, cmakeFile, modules);
+	        for(Module m : modules) {
+	        	if(m.affectedModules.isEmpty()) continue;
+	    		System.out.println("모듈이름: " + m.moduleName);
+	
+	        	for(String s : m.affectedModules) {
+	        		System.out.println(s);
+	        	}
+	    		System.out.println("");
+	        }
+
 	//		printCMakeContents(root, cmakeFile);
 	//		printModuleInfo(modules);
 		}
@@ -119,25 +128,16 @@ public class CMakeParser {
 	            }
 	        	
 //	        	여기까지는 모듈이름, 모듈아웃풋 형태만 module에 저장되어 있음
-//	        	순회해서 이름으로 찾아야되나...?
+//	        	순회해서 이름으로 찾아야되나
 	        	
 	        	if (isTargetLinkLibrariesLine(line)) {
 	        		processTargetLinkLibraries(line, conditions, modules);
 	        	}
-	        }
-	        for(Module m : modules) {
-	        	if(m.affectedModules.isEmpty()) continue;
-	    		System.out.println(m.moduleName);
-	
-	        	for(String s : m.affectedModules) {
-	        		System.out.println(s);
-	        	}
-	    		System.out.println("");
+	        	
 	        }
 		}	
 	
 		private void storeConditionInfo(String line, Conditions conditions) {
-//			Condition condition = new Condition();
 			if(line.contains("endif()")) {
 				conditions.pop();
 				return;
@@ -191,10 +191,13 @@ public class CMakeParser {
 	//    	finalModuleName = deleteQuote(finalModuleName);
 	//    }
 	
+	        System.out.println(line);
+	        System.out.println("모듈이름 : " + finalModuleName);
 	        String outputType = "EXE";
+	        System.out.println("add_exe 또 실행");
+
 	        Module module = new Module(new StringBuilder(finalModuleName), outputType);
 			modules.add(module);
-//	        extractModuleInfo(result, line, conditions, new StringBuilder(finalModuleName), outputType, cmakeFile, modules);
 	        
 	        moduleNameBuilder.setLength(0);
 		}
@@ -219,25 +222,42 @@ public class CMakeParser {
 			if(outputType.equals("SHARED")) {
 				Module module = new Module(new StringBuilder(finalModuleName), outputType);
 				modules.add(module);
-//				extractModuleInfo(result, line, conditions, new StringBuilder(finalModuleName), outputType, cmakeFile, modules);
 			}
 		}
 		
 		
 		private void processTargetLinkLibraries(String line, Conditions conditions, List<Module> modules) {
 	        for (String item : conditions.data) {
-	            if (!item.equals("WIN32")) { // 조건이 WIN32인 경우 아니면 리턴
+	            if (!item.equals("WIN32") && !item.equals("UNIX")) { // 조건이 WIN32인 경우 아니면 리턴
 	                return;
 	            }
-	        
+	            
 	            int startIndex = line.indexOf('(') + 1;
 	            int endIndex = line.indexOf(')');
-	        
+	            
 	            StringBuilder moduleNameBuilder = new StringBuilder();
 	            moduleNameBuilder.append(line.substring(startIndex, endIndex).trim());
 	            String[] affactedModuleNameString = moduleNameBuilder.toString().split(" ");
 	            
-	            String currentModuleName = affactedModuleNameString[0];
+	            String currentModuleName = affactedModuleNameString[0].trim();
+	            
+//	        	ucommon 모듈 있는지 확인 후 넣기
+	        	if (item.equals("UNIX")) {
+        			System.out.println("UNIX : ");
+    	            for(Module m : modules) {
+    	            	if(m.moduleName.toString().equals(currentModuleName)) {
+    	    	            for (int i = 1; i < affactedModuleNameString.length; i++) {
+    	    	            	String affectedModuleName = affactedModuleNameString[i].trim();
+	    	            		if(affectedModuleName.equals("ucommon")) {
+//	        	            		System.out.println("일치함");
+	        	            		m.addAffectedModule("ucommon");
+	    	            		}
+    	    	            }
+    	            	}
+    	            }
+	            	return;
+	        	}
+	            
 	            
 	            for(Module m : modules) {
 	            	if(m.moduleName.toString().equals(currentModuleName)) {
@@ -246,7 +266,6 @@ public class CMakeParser {
 	    	            	if (!affectedModuleName.isEmpty()) {  // 공백을 제거한 후 비어있지 않으면 추가
 	    	            		if(affectedModuleName.equals("PRIVATE") || affectedModuleName.equals("PUBLIC")) continue;
 	    	            		if(m.affectedModules.contains(affectedModuleName)) continue;
-//	    						모듈 이름 일치하는지 확인 추가
 	    	            		m.addAffectedModule(affectedModuleName);
 //	    						System.out.println(affectedModuleName);
 	    	            	}
@@ -254,43 +273,13 @@ public class CMakeParser {
 
 	            	}
 	            }
-//	            modules.add
-	            
 	        }
-
-			
 		}
 
 	
 		// 참조 모듈 추출
 		public void extractLinkedModules(CMakeContents result, String line, Conditions conditions, Module module, File cmakeFile, List<Module> modules) {
-			boolean isWIN32 = false;
-	//		System.out.println(cmakeFile.getPath());
-	//		System.out.println("이름 : " + module.moduleName);
-			
-			
-			if(line.contains("if(WIN32)")) isWIN32 = true;
-			
-			if(line.contains("target_link_libraries")) {
-//				if (!isWIN32) return;
-//		        int startIndex = line.indexOf('(') + 1;
-//		        int endIndex = line.indexOf(')');
-//		        
-//		        StringBuilder moduleNameBuilder = new StringBuilder();
-//		        moduleNameBuilder.append(line.substring(startIndex, endIndex).trim());
-//		        String[] affactedModuleNameString = moduleNameBuilder.toString().split(" ");
-//		        for (int i = 1; i < affactedModuleNameString.length; i++) {
-//		            String affectedModuleName = affactedModuleNameString[i].trim();
-//		            if (!affectedModuleName.isEmpty()) {  // 공백을 제거한 후 비어있지 않으면 추가
-//		            	if(affectedModuleName.equals("PRIVATE") || affectedModuleName.equals("PUBLIC")) continue;
-//		            	if(module.affectedModules.contains(affectedModuleName)) continue;
-//	//			모듈 이름 일치하는지 확인 추가
-//		            	module.addAffectedModule(affectedModuleName);
-//	//			System.out.println(affectedModuleName);
-//		            }
-//		        }
-			}
-	  }
+		}
 	  
 		public void extractModuleInfo(CMakeContents result, String line, Conditions conditions, StringBuilder moduleName, String outputType, File cmakeFile, List<Module> modules) {
 			
@@ -328,7 +317,6 @@ public class CMakeParser {
 			// 없으므로 mlist return
 			
 	//		return mlist; 
+		}
 	}
-	}
-
 }
