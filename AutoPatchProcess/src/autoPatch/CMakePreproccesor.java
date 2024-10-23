@@ -163,7 +163,8 @@ public class CMakePreproccesor {
 		}
 
 		Macro getMacro(String line) {
-			Pattern setPattern = Pattern.compile("set\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE); // set(매크로명 <파일리스트>)
+			Pattern setPattern = Pattern.compile("set\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE); // set(매크로명
+																													// <파일리스트>)
 
 			line = line.trim();
 			Matcher matcher = setPattern.matcher(line);
@@ -173,7 +174,7 @@ public class CMakePreproccesor {
 				macro.key = matcher.group(1);
 				String macroValue = matcher.group(2);
 				if (macroValue.contains("\"")) {
-				    macroValue = macroValue.replaceAll("\"", "");
+					macroValue = macroValue.replaceAll("\"", "");
 				}
 
 				macro.value = macroValue;
@@ -339,7 +340,7 @@ public class CMakePreproccesor {
 				result.setPath(cMakeListPath);
 //				System.out.println("현재경로 : " + result.path);
 				for (String statement : statements) {
-						
+
 					resultReplaceMacro.add(replaceMacro(statement));
 
 					if (isSetMacro(statement)) {
@@ -356,7 +357,7 @@ public class CMakePreproccesor {
 						CMakeContents subResult = preprocess(path);
 						result.addChild(subResult);
 //						System.out.println(result.path);
-	
+
 					}
 				}
 //				if(result.path.contains("POCO_LIB\\Foundation\\")) {
