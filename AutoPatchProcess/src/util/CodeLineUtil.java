@@ -20,7 +20,7 @@ public class CodeLineUtil {
 		Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);
 		line = line.trim();
 		Matcher matcher = setPattern.matcher(line);
-
+//		System.out.println(line);
 		return matcher.matches();
 	}
 

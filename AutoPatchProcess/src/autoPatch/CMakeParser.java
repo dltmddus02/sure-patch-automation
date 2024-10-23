@@ -79,10 +79,10 @@ public class CMakeParser {
 		}
 
 		private void storeConditionInfo(String line, Conditions conditions) {
-			if (line.contains("endif()")) {
+			if (line.contains("endif()") || line.contains("ENDIF()")) {
 				conditions.pop();
 				return;
-			} else if (line.contains("elseif(")) {
+			} else if (line.contains("elseif(") || line.contains("ELSEIF(") || line.contains("else(") || line.contains("ELSE(")) {
 				conditions.pop();
 			} else if (line.contains("if(") || line.contains("IF(")) {
 

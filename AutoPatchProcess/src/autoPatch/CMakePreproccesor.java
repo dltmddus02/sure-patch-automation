@@ -107,16 +107,14 @@ public class CMakePreproccesor {
 
 	class Preproccesor {
 		Macros macros;
+		boolean isTopLevel = true;
 
 		public Preproccesor() {
 			this.macros = new Macros();
 			this.macros.data = new Stack<>();
 		}
 
-		int depth = 0;
-
 		List<String> read(String cMakeListPath) {
-//			+ "\\CMakeLists.txt"
 			List<String> lineList = new ArrayList<>();
 			File cMakeList = new File(cMakeListPath + "\\CMakeLists.txt");
 			try (BufferedReader reader = new BufferedReader(new FileReader(cMakeList))) {
@@ -205,20 +203,38 @@ public class CMakePreproccesor {
 
 		}
 
+//		- [x] ${CMAKE_SOURCE_DIR}
+//		- [ ] ${CMAKE_MODULE_PATH}
+//		- [ ] ${CMAKE_CURRENT_LIST_DIR}
+//		- [x] ${CMAKE_CURRENT_SOURCE_DIR}
+
 		Macro setCMakeSourceDir(String cMakeListPath) {
 			Macro macro = new Macro();
 			macro.key = "CMAKE_SOURCE_DIR";
 			macro.value = cMakeListPath;
 			return macro;
-//			macros.add(macro);
-
-//			return macros;
 		}
 
-//		${CMAKE_CURRENT_SOURCE_DIR}: 현재 CMakeLists.txt 파일이 있는 디렉터리의 경로
-//		${CMAKE_SOURCE_DIR}: 최상위 CMakeLists.txt 파일이 위치한 디렉터리의 절대 경로
-//		${CMAKE_BINARY_DIR}: 빌드 디렉터리의 경로
-//		${CMAKE_CXX_COMPILER}: C++ 컴파일러 경로
+		Macro setCMakeModulePath(String cMakeListPath) {
+			Macro macro = new Macro();
+			macro.key = "CMAKE_MODULE_PATH";
+			macro.value = cMakeListPath;
+			return macro;
+		}
+
+		Macro setCMakeCurrentListDir(String cMakeListPath) {
+			Macro macro = new Macro();
+			macro.key = "CMAKE_CURRENT_LIST_DIR";
+			macro.value = cMakeListPath;
+			return macro;
+		}
+
+		Macro setCMakeCurrentSourceDir(String cMakeListPath) {
+			Macro macro = new Macro();
+			macro.key = "CMAKE_CURRENT_SOURCE_DIR";
+			macro.value = cMakeListPath;
+			return macro;
+		}
 
 		boolean isAddSubDirectory(String line) {
 			if (line.contains("add_subdirectory")) {
@@ -276,7 +292,14 @@ public class CMakePreproccesor {
 		CMakeContents preprocess(String cMakeListPath) throws IOException {
 			CMakeContents result = new CMakeContents();
 			macros.push();
-			macros.add(setCMakeSourceDir(cMakeListPath));
+
+			if (isTopLevel) {
+				macros.add(setCMakeSourceDir(cMakeListPath));
+				isTopLevel = false;
+			}
+
+			macros.add(setCMakeCurrentSourceDir(cMakeListPath));
+//			macros.add(setCMakeSourceDir(cMakeListPath));
 //			macros = setCMakeSourceDir(macros, cMakeListPath);
 			result.setPath(cMakeListPath);
 
@@ -292,6 +315,8 @@ public class CMakePreproccesor {
 				macros.pop();
 			}
 
+			macros.showMacros();
+
 			return result;
 		}
 
@@ -304,9 +329,11 @@ public class CMakePreproccesor {
 
 				if (CodeLineUtil.isSetMacro(statement)) {
 					macros.add(getMacro(statement));
+//					System.out.println(statement);
 				}
 				if (CodeLineUtil.isProjectStatememt(statement)) {
 					macros.add(getProjectMacro(statement));
+//					System.out.println(statement);
 				}
 				if (isAddSubDirectory(statement)) {
 					String path = getCmakePath(cMakeListPath, statement);
