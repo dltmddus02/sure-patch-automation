@@ -10,12 +10,14 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import util.CodeLineUtil;
+
 public class CMakePreproccesor {
 
-	class CMakeContents { // 매크로 치환한 txt 저장하는 클래스
+	class CMakeContents {
 		List<String> contents;
 		List<CMakeContents> children;
-		String path; // 현재 경로
+		String path;
 
 		public CMakeContents() {
 			this.contents = new ArrayList<>();
@@ -221,22 +223,22 @@ public class CMakePreproccesor {
 			return macros;
 		}
 
-		boolean isSetMacro(String line) { // 매크로를 정의하는 줄이냐? set()이 있는가?
-			Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);
-			line = line.trim();
-			Matcher matcher = setPattern.matcher(line);
-
-			return matcher.matches();
-		}
-
-		boolean isProjectStatememt(String line) {
-			Pattern setPattern = Pattern.compile("project\\(.*\\)");
-			line = line.trim();
-
-			Matcher matcher = setPattern.matcher(line);
-
-			return matcher.matches();
-		}
+//		boolean isSetMacro(String line) {
+//			Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);
+//			line = line.trim();
+//			Matcher matcher = setPattern.matcher(line);
+//
+//			return matcher.matches();
+//		}
+//
+//		boolean isProjectStatememt(String line) {
+//			Pattern setPattern = Pattern.compile("project\\(.*\\)");
+//			line = line.trim();
+//
+//			Matcher matcher = setPattern.matcher(line);
+//
+//			return matcher.matches();
+//		}
 
 //		${CMAKE_CURRENT_SOURCE_DIR}: 현재 CMakeLists.txt 파일이 있는 디렉터리의 경로
 //		${CMAKE_SOURCE_DIR}: 최상위 CMakeLists.txt 파일이 위치한 디렉터리의 절대 경로
@@ -343,11 +345,11 @@ public class CMakePreproccesor {
 
 					resultReplaceMacro.add(replaceMacro(statement));
 
-					if (isSetMacro(statement)) {
+					if (CodeLineUtil.isSetMacro(statement)) {
 						Macro macro = getMacro(statement);
 						macros.add(macro);
 					}
-					if (isProjectStatememt(statement)) { // project 매크로 가져옴
+					if (CodeLineUtil.isProjectStatememt(statement)) { // project 매크로 가져옴
 						Macro macro = getProjectMacro(statement);
 //						System.out.println("macro : " + macro.key + " : " + macro.value);
 						macros.add(macro);
@@ -360,12 +362,6 @@ public class CMakePreproccesor {
 
 					}
 				}
-//				if(result.path.contains("POCO_LIB\\Foundation\\")) {
-//				System.out.println(cMakeListPath);
-//				macros.showMacros();
-//			}
-
-//				macros.showMacros();
 				replacedStatements = replaceMacros(resultReplaceMacro);
 				macros.pop();
 

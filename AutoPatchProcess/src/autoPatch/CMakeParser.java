@@ -61,18 +61,16 @@ public class CMakeParser {
 
 			for (String line : result.contents) {
 
-				// if 스택 저장하기
 				storeConditionInfo(line, conditions);
 
-				// 1. add_executable
+//				 1. 모듈 이름 저장
 				if (CodeLineUtil.isAddExecutableLine(line)) {
 					processAddExecutable(line, modules);
-				}
-				// 2. add_library
-				else if (CodeLineUtil.isAddLibraryLine(line)) {
+				} else if (CodeLineUtil.isAddLibraryLine(line)) {
 					processAddLibrary(line, modules);
 				}
 
+//				2. 의존 모듈 저장
 				if (CodeLineUtil.isTargetLinkLibrariesLine(line)) {
 					processTargetLinkLibraries(line, conditions, modules);
 				}
@@ -159,9 +157,7 @@ public class CMakeParser {
 				if (ValidationUtil.isIgnorableModule(affectedModuleName, condition)) {
 					continue;
 				}
-				if (!module.affectedModules.contains(affectedModuleName)) {
-					module.addAffectedModule(affectedModuleName);
-				}
+				module.addAffectedModule(affectedModuleName);
 			}
 		}
 
