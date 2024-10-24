@@ -1,4 +1,4 @@
-package autoPatch;
+package autopatch;
 
 import java.io.File;
 import java.util.Collections;
@@ -6,17 +6,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import autoPatch.CMakePreproccesor.CMakeContents;
-import util.ValidationUtil;
+import autopatch.CMakePreproccesor.CMakeContents;
 import util.CodeLineUtil;
+import util.ValidationUtil;
 
 public class CMakeParser {
 
-	class Condition {
+	public class Condition {
 		String value;
 	}
 
-	class Conditions {
+	public class Conditions {
 		Stack<String> data = new Stack<>();
 
 		void push(String value) {
@@ -30,7 +30,7 @@ public class CMakeParser {
 		}
 	}
 
-	class Parser {
+	public class Parser {
 		public void parseCMakeFile(CMakeContents root, List<Module> modules) {
 			File cmakeFile = new File(root.path + "\\CMakeLists.txt");
 			recurseProcess(root, cmakeFile, modules);

@@ -1,14 +1,14 @@
-package autoPatch;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import autoPatch.CMakePreproccesor.Macros;
-import autoPatch.CMakeParser.Parser;
-import autoPatch.CMakePreproccesor.CMakeContents;
-import autoPatch.CMakePreproccesor.Preproccesor;
+import autopatch.Module;
+import autopatch.CMakeParser;
+import autopatch.CMakeParser.Parser;
+import autopatch.CMakePreproccesor;
+import autopatch.CMakePreproccesor.CMakeContents;
+import autopatch.CMakePreproccesor.Preproccesor;
 
 public class Main {
 	public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class Main {
 		String topDirectory = "C:\\Users\\sure\\CTcode\\engine";
 
 		try {
-			
+
 			CMakeContents root = preprocessor.preprocess(topDirectory);
 			parser.parseCMakeFile(root, modules);
 			System.out.println("성공적으로 완료.");

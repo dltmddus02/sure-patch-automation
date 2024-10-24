@@ -1,4 +1,4 @@
-package autoPatch;
+package autopatch;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +15,7 @@ import util.CodeLineUtil;
 
 public class CMakePreproccesor {
 
-	class CMakeContents {
+	public class CMakeContents {
 		List<String> contents;
 		List<CMakeContents> children;
 		String path;
@@ -105,7 +105,7 @@ public class CMakePreproccesor {
 		}
 	}
 
-	class Preproccesor {
+	public class Preproccesor {
 		Macros macros;
 		boolean isTopLevel = true;
 
@@ -289,7 +289,7 @@ public class CMakePreproccesor {
 			return result.toString();
 		}
 
-		CMakeContents preprocess(String cMakeListPath) throws IOException {
+		public CMakeContents preprocess(String cMakeListPath) throws IOException {
 			CMakeContents result = new CMakeContents();
 			macros.push();
 
@@ -299,8 +299,6 @@ public class CMakePreproccesor {
 			}
 
 			macros.add(setCMakeCurrentSourceDir(cMakeListPath));
-//			macros.add(setCMakeSourceDir(cMakeListPath));
-//			macros = setCMakeSourceDir(macros, cMakeListPath);
 			result.setPath(cMakeListPath);
 
 			try {
@@ -315,7 +313,7 @@ public class CMakePreproccesor {
 				macros.pop();
 			}
 
-			macros.showMacros();
+//			macros.showMacros();
 
 			return result;
 		}
@@ -325,6 +323,11 @@ public class CMakePreproccesor {
 			List<String> resultReplaceMacro = new ArrayList<>();
 
 			for (String statement : statements) {
+				if (statement.contains("CMAKE_CURRENT_SOURCE_DIR")) {
+					System.out.println(statement);
+
+				}
+				
 				resultReplaceMacro.add(replaceMacro(statement));
 
 				if (CodeLineUtil.isSetMacro(statement)) {
