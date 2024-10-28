@@ -1,4 +1,4 @@
-package autoPatch;
+package main.autopatch;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Module {
-	StringBuilder moduleName;
+	private StringBuilder moduleName;
 	String outputType;
 	List<String> sourceFiles;
 	Set<String> affectedModules;
@@ -26,4 +26,7 @@ public class Module {
 		affectedModules.add(library);
 	}
 
+	public String getModuleName() {
+		return moduleName.toString();
+	}
 }

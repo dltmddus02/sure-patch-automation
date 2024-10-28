@@ -1,4 +1,4 @@
-package autoPatch;
+package main.autopatch;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,14 +11,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import util.CodeLineUtil;
+import main.util.CodeLineUtil;
 
-public class CMakePreproccesor {
+public class CMakePreprocessor {
 
-	class CMakeContents {
-		List<String> contents;
-		List<CMakeContents> children;
-		String path;
+	public class CMakeContents {
+		public List<String> contents;
+		public List<CMakeContents> children;
+		public String path;
 
 		public CMakeContents() {
 			this.contents = new ArrayList<>();
@@ -105,11 +105,11 @@ public class CMakePreproccesor {
 		}
 	}
 
-	class Preproccesor {
+	public class Preprocessor {
 		Macros macros;
 		boolean isTopLevel = true;
 
-		public Preproccesor() {
+		public Preprocessor() {
 			this.macros = new Macros();
 			this.macros.data = new Stack<>();
 		}
@@ -150,13 +150,13 @@ public class CMakePreproccesor {
 				}
 
 				// 괄호가 모두 닫힌 경우
-				if (numBrackets == 0 && currentStatement.length() > 0) {
+				if (numBrackets == 0 && !currentStatement.isEmpty()) {
 					statements.add(currentStatement.toString().trim());
 					currentStatement.setLength(0);
 				}
 			}
 
-			if (currentStatement.length() > 0) {
+			if (!currentStatement.isEmpty()) {
 				statements.add(currentStatement.toString().trim());
 			}
 
@@ -289,7 +289,7 @@ public class CMakePreproccesor {
 			return result.toString();
 		}
 
-		CMakeContents preprocess(String cMakeListPath) throws IOException {
+		public CMakeContents preprocess(String cMakeListPath) throws IOException {
 			CMakeContents result = new CMakeContents();
 			macros.push();
 
@@ -299,8 +299,6 @@ public class CMakePreproccesor {
 			}
 
 			macros.add(setCMakeCurrentSourceDir(cMakeListPath));
-//			macros.add(setCMakeSourceDir(cMakeListPath));
-//			macros = setCMakeSourceDir(macros, cMakeListPath);
 			result.setPath(cMakeListPath);
 
 			try {
@@ -315,7 +313,7 @@ public class CMakePreproccesor {
 				macros.pop();
 			}
 
-			macros.showMacros();
+//			macros.showMacros();
 
 			return result;
 		}
@@ -325,6 +323,11 @@ public class CMakePreproccesor {
 			List<String> resultReplaceMacro = new ArrayList<>();
 
 			for (String statement : statements) {
+//				if (statement.contains("CMAKE_CURRENT_LIST_DIR")) {
+//					System.out.println(statement);
+//
+//				}
+				
 				resultReplaceMacro.add(replaceMacro(statement));
 
 				if (CodeLineUtil.isSetMacro(statement)) {
