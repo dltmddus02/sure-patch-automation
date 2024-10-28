@@ -12,7 +12,7 @@ public class ModuleProcessor {
 		String[] moduleNames = moduleName.split(" ");
 
 		String currentModuleName = moduleNames[0].trim();
- 
+
 		String outputType = "EXE";
 
 		Module module = new Module(new StringBuilder(currentModuleName), outputType);

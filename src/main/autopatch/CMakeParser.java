@@ -14,24 +14,6 @@ import main.util.ValidationUtil;
 
 public class CMakeParser {
 
-//	public class Condition {
-//		String value;
-//	}
-//
-//	public class Conditions {
-//		Stack<String> data = new Stack<>();
-//
-//		void push(String value) {
-//			data.add(value);
-//		}
-//
-//		void pop() {
-//			if (!data.isEmpty()) {
-//				data.pop();
-//			}
-//		}
-//	}
-//
 	public class Parser {
 		ModuleProcessor moduleProcessor = new ModuleProcessor();
 
