@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/autopatch/CMakePreprocessor.java
 package main.autopatch;
+========
+package autopatch;
+>>>>>>>> 7f544c9421adf040b07ba7d98e3753ddb8004a2e:AutoPatchProcess/src/main/java/autopatch/CMakePreproccesor.java
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,9 +20,15 @@ import main.util.CodeLineUtil;
 public class CMakePreprocessor {
 
 	public class CMakeContents {
+<<<<<<<< HEAD:src/main/autopatch/CMakePreprocessor.java
 		public List<String> contents;
 		public List<CMakeContents> children;
 		public String path;
+========
+		List<String> contents;
+		List<CMakeContents> children;
+		String path;
+>>>>>>>> 7f544c9421adf040b07ba7d98e3753ddb8004a2e:AutoPatchProcess/src/main/java/autopatch/CMakePreproccesor.java
 
 		public CMakeContents() {
 			this.contents = new ArrayList<>();
@@ -105,7 +115,11 @@ public class CMakePreprocessor {
 		}
 	}
 
+<<<<<<<< HEAD:src/main/autopatch/CMakePreprocessor.java
 	public class Preprocessor {
+========
+	public class Preproccesor {
+>>>>>>>> 7f544c9421adf040b07ba7d98e3753ddb8004a2e:AutoPatchProcess/src/main/java/autopatch/CMakePreproccesor.java
 		Macros macros;
 		boolean isTopLevel = true;
 
@@ -323,10 +337,17 @@ public class CMakePreprocessor {
 			List<String> resultReplaceMacro = new ArrayList<>();
 
 			for (String statement : statements) {
+<<<<<<<< HEAD:src/main/autopatch/CMakePreprocessor.java
 //				if (statement.contains("CMAKE_CURRENT_LIST_DIR")) {
 //					System.out.println(statement);
 //
 //				}
+========
+				if (statement.contains("CMAKE_CURRENT_SOURCE_DIR")) {
+					System.out.println(statement);
+
+				}
+>>>>>>>> 7f544c9421adf040b07ba7d98e3753ddb8004a2e:AutoPatchProcess/src/main/java/autopatch/CMakePreproccesor.java
 				
 				resultReplaceMacro.add(replaceMacro(statement));
 
