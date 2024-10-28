@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/autopatch/Module.java
 package main.autopatch;
-========
-package autopatch;
->>>>>>>> 7f544c9421adf040b07ba7d98e3753ddb8004a2e:AutoPatchProcess/src/main/java/autopatch/Module.java
 
 import java.util.ArrayList;
 import java.util.HashSet;
