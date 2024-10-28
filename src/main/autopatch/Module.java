@@ -29,4 +29,8 @@ public class Module {
 	public String getModuleName() {
 		return moduleName.toString();
 	}
+
+	public String getOutputType() {
+		return outputType;
+	}
 }
