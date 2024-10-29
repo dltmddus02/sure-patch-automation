@@ -12,6 +12,25 @@ add_subdirectory(sub2)
 add_subdirectory(sub3)
 add_subdirectory(sub4)
 
+if(UNIX)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		-Wl,--start-group
+		cs_common
+		libUTIL_LIB64
+		PocoFoundationmt
+		ucommon
+		-Wl,--end-group
+		${CMAKE_DL_LIBS}
+	)
+elseif(WIN32)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		cs_common
+		libUTIL_LIB64
+		PocoFoundationmt
+	)
+endif()
+
+
 // 프로젝트 구조
 root / sub1
        / sub2 / sub2-1
