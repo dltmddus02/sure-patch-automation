@@ -4,28 +4,32 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
-import main.autopatch.CMakePreprocessor.CMakeContents;
 import main.domain.Condition;
-import main.service.ModuleProcessor;
+import main.domain.Module;
+import main.service.ModuleInfoExtractor;
 import main.util.CodeLineUtil;
-import main.util.ValidationUtil;
+import main.domain.CMakeContents;
 
 public class CMakeParser {
 
 	public class Parser {
-		ModuleProcessor moduleProcessor = new ModuleProcessor();
+		ModuleInfoExtractor moduleProcessor = new ModuleInfoExtractor();
 
 		public void parseCMakeFile(CMakeContents root, List<Module> modules) {
-			File cmakeFile = new File(root.path + "\\CMakeLists.txt");
+			File cmakeFile = new File(root.getPath() + "\\CMakeLists.txt");
 			recurseProcess(root, cmakeFile, modules);
+			
 			for (Module m : modules) {
-				if (m.affectedModules.isEmpty())
-					continue;
 				System.out.println("모듈이름: " + m.getModuleName());
+				if (m.getAffectedModules().isEmpty()) {
+					System.out.println("의존모듈이 없습니다");
+					System.out.println("");
 
-				for (String s : m.affectedModules) {
+					continue;
+				}
+
+				for (String s : m.getAffectedModules()) {
 					System.out.println(s);
 				}
 				System.out.println("");
@@ -35,8 +39,8 @@ public class CMakeParser {
 		private void recurseProcess(CMakeContents cmakeContents, File cmakeFile, List<Module> modules) {
 			processCMakeFile(cmakeContents, cmakeFile, modules);
 
-			for (CMakeContents child : cmakeContents.children) {
-				String currentDirectory = child.path;
+			for (CMakeContents child : cmakeContents.getChildren()) {
+				String currentDirectory = child.getPath();
 				File currentCMakeFile = new File(currentDirectory);
 				recurseProcess(child, currentCMakeFile, modules);
 			}
@@ -45,7 +49,7 @@ public class CMakeParser {
 		private void processCMakeFile(CMakeContents result, File cmakeFile, List<Module> modules) {
 			Condition condition = new Condition();
 
-			for (String line : result.contents) {
+			for (String line : result.getContents()) {
 
 				storeConditionInfo(line, condition);
 
@@ -85,15 +89,13 @@ public class CMakeParser {
 			}
 		}
 
-
-//		구현 전
 //		모듈 순회하며 모듈 간의 참조+의존성 저장하는 함수
 		public void findDependencies(List<String> input, Set<Module> output, List<Module> modules) {
 			for (String mf : input) {
 				for (Module m : modules) {
 					// m.affected~ 리스트 보면서 moduleFile와 같은지 보기
 					// 같다면 uniqueAffectedModules에 m 추가
-					if (m.affectedModules.contains(mf)) {
+					if (m.getAffectedModules().contains(mf)) {
 						output.add(m);
 						findDependencies(Collections.singletonList(m.getModuleName()), output, modules);
 					}

@@ -5,18 +5,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import main.autopatch.Module;
 import main.autopatch.CMakeParser;
 import main.autopatch.CMakeParser.Parser;
 import main.autopatch.CMakePreprocessor;
-import main.autopatch.CMakePreprocessor.CMakeContents;
-import main.autopatch.CMakePreprocessor.Preprocessor;
+import main.domain.CMakeContents;
+import main.domain.Module;
 
 public class Main {
 	public static void main(String[] args) {
 
 		CMakePreprocessor cmakePreprocessor = new CMakePreprocessor();
-		Preprocessor preprocessor = cmakePreprocessor.new Preprocessor();
 
 		CMakeParser cmakeParser = new CMakeParser();
 		Parser parser = cmakeParser.new Parser();
@@ -26,7 +24,7 @@ public class Main {
 
 		try {
 
-			CMakeContents root = preprocessor.preprocess(topDirectory);
+			CMakeContents root = cmakePreprocessor.preprocess(topDirectory);
 			parser.parseCMakeFile(root, modules);
 			System.out.println("성공적으로 완료.");
 //			System.out.println(System.getenv("CMAKE_SOURCE_DIR"));

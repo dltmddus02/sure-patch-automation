@@ -5,353 +5,290 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import main.domain.CMakeContents;
+import main.domain.Macro;
+import main.domain.Macros;
 import main.util.CodeLineUtil;
-import main.domain.*;
 
 public class CMakePreprocessor {
+	private Stack<List<Macro>> data;
+	private Macros macros;
 
-	public class CMakeContents {
-		public List<String> contents;
-		public List<CMakeContents> children;
-		public String path;
+	private boolean isTopLevel = true;
 
-		public CMakeContents() {
-			this.contents = new ArrayList<>();
-			this.children = new ArrayList<>();
-		}
-
-		public void setContent(List<String> content) {
-			this.contents = content;
-		}
-
-		public void addChild(CMakeContents child) {
-			children.add(child);
-		}
-
-		public void setPath(String cMakeListPath) {
-			this.path = cMakeListPath;
-		}
-
+	public CMakePreprocessor() {
+		data = new Stack<>();
+		macros = new Macros(data);
 	}
 
-//	class Macro {
-//		String key;
-//		String value;
-//	}
-
-//	class Macros {
-//		Stack<List<Macro>> data;
-//
-//		void push() {
-//			data.add(new ArrayList<>());
-//		}
-//
-//		void pop() {
-//			if (!data.isEmpty()) {
-////		    	System.out.println("pop!");
-//				data.pop();
-//			}
-//		}
-//
-//		void showMacros() {
-//			System.out.println("showMacros() ");
-//
-//			for (int i = data.size() - 1; i >= 0; i--) {
-//				List<Macro> currentList = data.get(i);
-//
-//				for (Macro macro : currentList) {
-//					if (macro != null) {
-//						System.out.println("key : value = " + macro.key + " : " + macro.value);
-//					}
-//				}
-//			}
-//		}
-//
-//		String find(String key) {
-//			for (int i = data.size() - 1; i >= 0; i--) {
-//				List<Macro> currentList = data.get(i);
-//
-//				for (Macro macro : currentList) {
-//					if (macro != null && macro.key.equals(key)) {
-//						return macro.value;
-//					}
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		void add(Macro macro) {
-//			if (macro == null) {
-//				System.out.println("macro 비어있어서 추가할 수 없습니다.");
-//				return;
-//			}
-//			if (!data.isEmpty()) {
-//				List<Macro> currentList = data.peek();
-//				for (int i = 0; i < currentList.size(); i++) {
-//					if (currentList.get(i) != null && currentList.get(i).key.equals(macro.key)) {
-//						currentList.set(i, macro);
-//						return;
-//					}
-//				}
-//				currentList.add(macro);
-//				return;
-//			}
-//		}
-//	}
-
-	public class Preprocessor {
-		Stack<List<Macro>> data;
-		Macros macros;
-
-		boolean isTopLevel = true;
-
-		public Preprocessor() {
-//			this.macros = new Macros();
-//			this.macros.data = new Stack<>();
-			data = new Stack<>();
-			macros = new Macros(data);
-		}
-
-		List<String> read(String cMakeListPath) {
-			List<String> lineList = new ArrayList<>();
-			File cMakeList = new File(cMakeListPath + "\\CMakeLists.txt");
-			try (BufferedReader reader = new BufferedReader(new FileReader(cMakeList))) {
-				String line;
-				while ((line = reader.readLine()) != null) {
-					lineList.add(line);
-				}
-			} catch (IOException e) {
-				System.out.println("파일 읽는 중 오류가 발생했습니다. : " + e.getMessage());
+	private List<String> read(String cMakeListPath) {
+		List<String> lineList = new ArrayList<>();
+		File cMakeList = new File(cMakeListPath + "\\CMakeLists.txt");
+		try (BufferedReader reader = new BufferedReader(new FileReader(cMakeList))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				lineList.add(line);
 			}
-
-			return lineList;
+		} catch (IOException e) {
+			System.out.println("파일 읽는 중 오류가 발생했습니다. : " + e.getMessage());
 		}
 
-		List<String> makeStatements(List<String> lines) {
-			List<String> statements = new ArrayList<>();
-			StringBuilder currentStatement = new StringBuilder();
-			int numBrackets = 0;
+		return lineList;
+	}
 
-			for (String line : lines) {
-				if (line.trim().startsWith("#"))
-					continue;
-				currentStatement.append(line).append(" ");
+	List<String> makeStatements(List<String> lines) {
+		List<String> statements = new ArrayList<>();
+		StringBuilder currentStatement = new StringBuilder();
+		int numBrackets = 0;
 
-				// 현재 line에서 괄호의 열림과 닫힘을 카운트
-				char[] arrChar = line.toCharArray();
-				for (char ch : arrChar) {
-					if (ch == '(') {
-						numBrackets++;
-					} else if (ch == ')') {
-						numBrackets--;
-					}
-				}
+		for (String line : lines) {
+			if (line.trim().startsWith("#"))
+				continue;
+			currentStatement.append(line).append(" ");
 
-				// 괄호가 모두 닫힌 경우
-				if (numBrackets == 0 && !currentStatement.isEmpty()) {
-					statements.add(currentStatement.toString().trim());
-					currentStatement.setLength(0);
+			char[] arrChar = line.toCharArray();
+			for (char ch : arrChar) {
+				if (ch == '(') {
+					numBrackets++;
+				} else if (ch == ')') {
+					numBrackets--;
 				}
 			}
 
-			if (!currentStatement.isEmpty()) {
+			if (numBrackets == 0 && !currentStatement.isEmpty()) {
 				statements.add(currentStatement.toString().trim());
+				currentStatement.setLength(0);
 			}
-
-			return statements;
 		}
+
+		if (!currentStatement.isEmpty()) {
+			statements.add(currentStatement.toString().trim());
+		}
+
+		return statements;
+	}
 
 //		- [x] ${CMAKE_SOURCE_DIR}
 //		- [ ] ${CMAKE_MODULE_PATH}
 //		- [ ] ${CMAKE_CURRENT_LIST_DIR}
 //		- [x] ${CMAKE_CURRENT_SOURCE_DIR}
 
-		boolean isAddSubDirectory(String line) {
-			if (line.contains("add_subdirectory")) {
-				return true;
-			}
-			return false;
+	private boolean isAddSubDirectory(String line) {
+		if (line.contains("add_subdirectory")) {
+			return true;
 		}
+		return false;
+	}
 
-		String getCmakePath(String cMakeListPath, String statement) {
-			String path = statement.substring(statement.indexOf('(') + 1, statement.indexOf(')')).trim();
-			if (path == null)
-				return null;
-			if (!path.contains("\\")) {
-				path = path.replace('/', '\\');
-			}
-			if (path != null) {
-				path = cMakeListPath + "\\" + path;
-			}
-			return path;
-		}
-
-//		
-		String replaceMacro(String statement) {
-			return processMacro(statement.trim());
-		}
-
-		List<String> replaceMacros(List<String> statements) {
-			return statements.stream().map(statement -> processMacro(statement)).collect(Collectors.toList());
-		}
-
-		private String processMacro(String line) {
-			if (!line.contains("${") || !line.contains("}")) {
-				return line;
-			}
-
-			Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
-			Matcher matcher = pattern.matcher(line);
-			StringBuffer result = new StringBuffer();
-
-			while (matcher.find()) {
-				String macroName = matcher.group(1);
-				String macroValue = macros.find(macroName);
-
-				if (macroValue == null) {
-					macroValue = matcher.group(0);
-				}
-				macroValue = Matcher.quoteReplacement(macroValue);
-				matcher.appendReplacement(result, macroValue);
-			}
-			matcher.appendTail(result);
-
-			return result.toString();
-		}
-
-		public CMakeContents preprocess(String cMakeListPath) throws IOException {
-			CMakeContents result = new CMakeContents();
-			macros.push();
-
-			if (isTopLevel) {
-				macros.add(setCMakeSourceDir(cMakeListPath));
-				isTopLevel = false;
-			}
-
-			macros.add(setCMakeCurrentSourceDir(cMakeListPath));
-			result.setPath(cMakeListPath);
-
-			try {
-				List<String> lines = read(cMakeListPath);
-				List<String> statements = makeStatements(lines);
-				List<String> replacedStatements = processStatements(result, cMakeListPath, statements);
-				result.setContent(replaceMacros(replacedStatements));
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				macros.pop();
-			}
-
-//			macros.showMacros();
-
-			return result;
-		}
-
-		public Macro getMacro(String line) {
-			Pattern setPattern = Pattern.compile("set\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE); // set(매크로명
-																													// <파일리스트>)
-
-			line = line.trim();
-			Matcher matcher = setPattern.matcher(line);
-
-			if (matcher.matches()) {
-				Macro macro = new Macro();
-				macro.setKey(matcher.group(1));
-				String macroValue = matcher.group(2);
-				if (macroValue.contains("\"")) {
-					macroValue = macroValue.replaceAll("\"", "");
-				}
-
-				macro.setValue(macroValue);
-				return macro;
-			}
-//			System.out.println(line);
-//			System.out.println("set() 예외");
+	private String getCmakePath(String cMakeListPath, String statement) {
+		String path = statement.substring(statement.indexOf('(') + 1, statement.indexOf(')')).trim();
+		if (path == null)
 			return null;
+		if (!path.contains("\\")) {
+			path = path.replace('/', '\\');
+		}
+		if (path != null) {
+			path = cMakeListPath + "\\" + path;
+		}
+		return path;
+	}
 
+	private String replaceMacro(String statement) {
+		return processMacro(statement.trim());
+	}
+
+	private List<String> replaceMacros(List<String> statements) {
+		return statements.stream().map(statement -> processMacro(statement)).collect(Collectors.toList());
+	}
+
+	private String processMacro(String line) {
+		if (!line.contains("${") || !line.contains("}")) {
+			return line;
 		}
 
-		Macro getProjectMacro(String line) {
-			Pattern setPattern = Pattern.compile("project\\s*\\(\\s*(\\w+)\\s*.*\\)"); // project(<프로젝트 이름> ~~)
+		Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
+		Matcher matcher = pattern.matcher(line);
+		StringBuffer result = new StringBuffer();
 
-			line = line.trim();
-			Matcher matcher = setPattern.matcher(line);
+		while (matcher.find()) {
+			String macroName = matcher.group(1);
+			List<String> macroValues = macros.find(macroName);
 
-			if (matcher.matches()) {
-				Macro macro = new Macro();
-				macro.setKey("PROJECT_NAME");
-				macro.setValue(matcher.group(1));
-				return macro;
-			}
-			return null;
-
-		}
-
-		Macro setCMakeCurrentSourceDir(String cMakeListPath) {
-			Macro macro = new Macro();
-			macro.setKey("CMAKE_CURRENT_SOURCE_DIR");
-			macro.setValue(cMakeListPath);
-			return macro;
-		}
-
-		public Macro setCMakeSourceDir(String cMakeListPath) {
-			Macro macro = new Macro();
-			macro.setKey("CMAKE_SOURCE_DIR");
-			macro.setValue(cMakeListPath);
-			return macro;
-		}
-
-		public Macro setCMakeModulePath(String cMakeListPath) {
-			Macro macro = new Macro();
-			macro.setKey("CMAKE_MODULE_PATH");
-			macro.setValue(cMakeListPath);
-			return macro;
-		}
-
-		public Macro setCMakeCurrentListDir(String cMakeListPath) {
-			Macro macro = new Macro();
-			macro.setKey("CMAKE_CURRENT_LIST_DIR");
-			macro.setValue(cMakeListPath);
-			return macro;
-		}
-
-		private List<String> processStatements(CMakeContents result, String cMakeListPath, List<String> statements)
-				throws IOException {
-			List<String> resultReplaceMacro = new ArrayList<>();
-
-			for (String statement : statements) {
-//				if (statement.contains("CMAKE_CURRENT_LIST_DIR")) {
-//					System.out.println(statement);
-//
-//				}
-
-				resultReplaceMacro.add(replaceMacro(statement));
-
-				if (CodeLineUtil.isSetMacro(statement)) {
-					macros.add(getMacro(statement));
-//					System.out.println(statement);
-				}
-				if (CodeLineUtil.isProjectStatememt(statement)) {
-					macros.add(getProjectMacro(statement));
-//					System.out.println(statement);
-				}
-				if (isAddSubDirectory(statement)) {
-					String path = getCmakePath(cMakeListPath, statement);
-					CMakeContents subResult = preprocess(path);
-					result.addChild(subResult);
-				}
+			if (macroValues == null) {
+				macroValues = new ArrayList<>();
+				macroValues.add(matcher.group(0));
 			}
 
-			return resultReplaceMacro;
+			String macroValueStr = String.join(" ", macroValues);
+			matcher.appendReplacement(result, Matcher.quoteReplacement(macroValueStr));
+
+//			macroValue = Matcher.quoteReplacement(macroValue);
+//			matcher.appendReplacement(result, macroValue);
 		}
+		matcher.appendTail(result);
+
+		return result.toString();
+	}
+
+	public CMakeContents preprocess(String cMakeListPath) throws IOException {
+		CMakeContents result = new CMakeContents();
+		macros.push();
+
+		if (isTopLevel) {
+			macros.add(setCMakeSourceDir(cMakeListPath));
+			isTopLevel = false;
+		}
+
+		macros.add(setCMakeCurrentSourceDir(cMakeListPath));
+		result.setPath(cMakeListPath);
+
+		try {
+			List<String> lines = read(cMakeListPath);
+			List<String> statements = makeStatements(lines);
+			List<String> replacedStatements = processStatements(result, cMakeListPath, statements);
+			result.setContents(replaceMacros(replacedStatements));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			macros.pop();
+		}
+
+//		macros.showMacros();
+
+		return result;
+	}
+
+	private Macro findSetMacro(String line) {
+		Pattern setPattern = Pattern.compile("set\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE); // set(매크로명
+																												// <파일리스트>)
+
+		line = line.trim();
+		Matcher matcher = setPattern.matcher(line);
+
+		if (matcher.matches()) {
+			Macro macro = new Macro();
+			macro.setKey(matcher.group(1));
+
+			String macroValue = matcher.group(2);
+			if (macroValue.contains("\"")) {
+				macroValue = macroValue.replaceAll("\"", "");
+			}
+			List<String> macroValues = Arrays.stream(macroValue.split("\\s+")).map(String::trim)
+					.filter(s -> !s.isEmpty()).collect(Collectors.toList());
+
+//			macroValues.forEach(System.out::println);
+			macro.setValue(macroValues);
+			return macro;
+		}
+		return null;
 
 	}
+
+	private Macro findFileMacro(String line) {
+		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE);
+//											  file <공백> (  <옵션> <매크로 이름> <암거나>  <암거나> ... ) 형태
+//											  file ( GLOB_RECURSE HDRS_G "include/*.h" )
+
+		line = line.trim();
+		Matcher matcher = setPattern.matcher(line);
+
+		if (matcher.matches()) {
+			Macro macro = new Macro();
+			macro.setKey(matcher.group(2));
+			String macroValue = matcher.group(3);
+			if (macroValue.contains("\"")) {
+				macroValue = macroValue.replaceAll("\"", "");
+			}
+			processWildcardPattern(macroValue);
+
+			List<String> macroValues = Arrays.asList(macroValue.split("\\s+")); // 띄어쓰기 기준으로 나눔
+
+			macro.setValue(macroValues);
+			return macro;
+		}
+		return null;
+
+	}
+
+	private void processWildcardPattern(String macroValue) {
+
+	}
+
+	private Macro findProjectMacro(String line) {
+		Pattern setPattern = Pattern.compile("project\\s*\\(\\s*(\\w+)\\s*.*\\)"); // project(<프로젝트 이름> ~~)
+
+		line = line.trim();
+		Matcher matcher = setPattern.matcher(line);
+
+		if (matcher.matches()) {
+			Macro macro = new Macro();
+			macro.setKey("PROJECT_NAME");
+			macro.setValue(Arrays.asList(matcher.group(1)));
+			return macro;
+		}
+		return null;
+
+	}
+
+	private Macro setCMakeCurrentSourceDir(String cMakeListPath) {
+		Macro macro = new Macro();
+		macro.setKey("CMAKE_CURRENT_SOURCE_DIR");
+		macro.setValue(Arrays.asList(cMakeListPath));
+		return macro;
+	}
+
+	private Macro setCMakeSourceDir(String cMakeListPath) {
+		Macro macro = new Macro();
+		macro.setKey("CMAKE_SOURCE_DIR");
+		macro.setValue(Arrays.asList(cMakeListPath));
+		return macro;
+	}
+
+	private Macro setCMakeModulePath(String cMakeListPath) {
+		Macro macro = new Macro();
+		macro.setKey("CMAKE_MODULE_PATH");
+		macro.setValue(Arrays.asList(cMakeListPath));
+		return macro;
+	}
+
+	private Macro setCMakeCurrentListDir(String cMakeListPath) {
+		Macro macro = new Macro();
+		macro.setKey("CMAKE_CURRENT_LIST_DIR");
+		macro.setValue(Arrays.asList(cMakeListPath));
+		return macro;
+	}
+
+	private List<String> processStatements(CMakeContents result, String cMakeListPath, List<String> statements)
+			throws IOException {
+		List<String> resultReplaceMacro = new ArrayList<>();
+
+		for (String statement : statements) {
+			resultReplaceMacro.add(replaceMacro(statement));
+
+			if (CodeLineUtil.isSetStatement(statement)) {
+				macros.add(findSetMacro(statement));
+//					System.out.println(statement);
+			}
+			if (CodeLineUtil.isProjectStatememt(statement)) {
+				macros.add(findProjectMacro(statement));
+//					System.out.println(statement);
+			}
+			if (isAddSubDirectory(statement)) {
+				String path = getCmakePath(cMakeListPath, statement);
+				CMakeContents subResult = preprocess(path);
+				result.addChild(subResult);
+			}
+		}
+
+		return resultReplaceMacro;
+	}
+
 }
