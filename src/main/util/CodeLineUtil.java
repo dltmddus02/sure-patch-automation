@@ -23,6 +23,13 @@ public class CodeLineUtil {
 		return matcher.matches();
 	}
 
+	public static boolean isFileStatement(String line) {
+		Pattern setPattern = Pattern.compile("file\\(.*\\)", Pattern.CASE_INSENSITIVE);
+		line = line.trim();
+		Matcher matcher = setPattern.matcher(line);
+		return matcher.matches();
+	}
+
 	public static boolean isProjectStatememt(String line) {
 		Pattern setPattern = Pattern.compile("project\\(.*\\)", Pattern.CASE_INSENSITIVE);
 		line = line.trim();
