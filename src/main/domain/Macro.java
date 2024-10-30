@@ -1,11 +1,10 @@
 package main.domain;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class Macro {
 	private String key;
-	private String value;
+	private List<String> value;
 
 	public String getKey() {
 		return key;
@@ -15,14 +14,13 @@ public class Macro {
 		this.key = key;
 	}
 
-	public String getValue() {
+	public List<String> getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(List<String> value) {
 		this.value = value;
 	}
-	
-	
+
 
 }

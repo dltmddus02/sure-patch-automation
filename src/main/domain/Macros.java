@@ -6,7 +6,7 @@ import java.util.Stack;
 
 public class Macros {
 	private Stack<List<Macro>> data;
-	
+
 	public Macros(Stack<List<Macro>> data) {
 		this.data = data;
 	}
@@ -36,7 +36,7 @@ public class Macros {
 		}
 	}
 
-	public String find(String key) {
+	public List<String> find(String key) {
 		for (int i = data.size() - 1; i >= 0; i--) {
 			List<Macro> currentList = data.get(i);
 

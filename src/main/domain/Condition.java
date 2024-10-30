@@ -15,13 +15,13 @@ public class Condition {
 			data.pop();
 		}
 	}
-	
+
 	public String getValue() {
 		return value;
 	}
-	
-	public Stack<String> getData(){
+
+	public Stack<String> getData() {
 		return data;
 	}
-	
+
 }
