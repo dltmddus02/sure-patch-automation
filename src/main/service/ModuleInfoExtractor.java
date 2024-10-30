@@ -2,11 +2,11 @@ package main.service;
 
 import java.util.List;
 
-import main.autopatch.Module;
 import main.domain.Condition;
+import main.domain.Module;
 import main.util.ValidationUtil;
 
-public class ModuleProcessor {
+public class ModuleInfoExtractor {
 	public void processAddExecutable(String line, List<Module> modules) {
 		String moduleName = ValidationUtil.getModuleName(line);
 		String[] moduleNames = moduleName.split(" ");
@@ -14,7 +14,9 @@ public class ModuleProcessor {
 		String currentModuleName = moduleNames[0].trim();
 
 		String outputType = "EXE";
-
+		
+		System.out.println(line);
+		
 		Module module = new Module(new StringBuilder(currentModuleName), outputType);
 		modules.add(module);
 	}
@@ -64,6 +66,10 @@ public class ModuleProcessor {
 			}
 			module.addAffectedModule(affectedModuleName);
 		}
+	}
+
+	public void processAffectedSourceFiles() {
+		
 	}
 
 	private String deleteQuote(String moduleName) {
