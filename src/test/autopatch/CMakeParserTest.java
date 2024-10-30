@@ -2,12 +2,9 @@ package test.autopatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,32 +14,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import main.autopatch.CMakeParser;
-import main.autopatch.CMakePreprocessor;
-import main.autopatch.CMakePreprocessor.CMakeContents;
-import main.autopatch.CMakePreprocessor.Preprocessor;
-import main.autopatch.Module;
 import main.domain.Condition;
-import main.service.ModuleProcessor;
+import main.domain.Module;
+import main.service.ModuleInfoExtractor;
 
 class CMakeParserTest {
-	private Preprocessor preprocessor;
-	private CMakeParser cmakeParser;
 	private CMakeParser.Parser parser;
 	private Condition condition;
-//	private Parser parser;
-	private CMakeContents root;
-	private ModuleProcessor moduleProcessor;
+	private ModuleInfoExtractor moduleProcessor;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		preprocessor = new CMakePreprocessor().new Preprocessor();
-		cmakeParser = new CMakeParser();
 		parser = new CMakeParser().new Parser();
 		condition = new Condition();
-		moduleProcessor = new ModuleProcessor();
-
-		String rootPath = "src\\test\\engine";
-		root = preprocessor.preprocess(rootPath);
+		moduleProcessor = new ModuleInfoExtractor();
 	}
 
 	@Test
@@ -125,13 +110,13 @@ class CMakeParserTest {
 	@DisplayName("Condition endif/else 정상적으로 pop되는지 검증")
 	public void testStoreConditionEndIfTest() throws Exception {
 		condition.push("CONDITION_PRE");
-		
+
 		Method method = CMakeParser.Parser.class.getDeclaredMethod("storeConditionInfo", String.class, Condition.class);
 		method.setAccessible(true);
 
 		String elseLine = "else()";
 		method.invoke(parser, elseLine, condition);
-		
+
 		assertEquals(1, condition.getData().size());
 
 		String endifLine = "endif()";
@@ -143,16 +128,16 @@ class CMakeParserTest {
 	@Test
 	@DisplayName("의존 모듈 정보 추출 검증")
 	void processTargetLinkLibrariesTest() throws IOException {
-	    String line = "target_link_libraries(testName PRIVATE -Wl,--start-group cs_common libUTIL_LIB64 PocoFoundationmt ucommon -Wl,--end-group ${CMAKE_DL_LIBS} )";
+		String line = "target_link_libraries(testName PRIVATE -Wl,--start-group cs_common libUTIL_LIB64 PocoFoundationmt ucommon -Wl,--end-group ${CMAKE_DL_LIBS} )";
 
-	    Module module = new Module(new StringBuilder("testName"), "EXE");
-	    List<Module> modules = Arrays.asList(module);
-	    
-	    condition.push("UNIX");
- 
-	    moduleProcessor.processTargetLinkLibraries(line, condition, modules);
-	    
-	    Assertion.assertThat(module.addAffectedModule("testName")).contains("PocoFoundationmt");
+		Module module = new Module(new StringBuilder("testName"), "EXE");
+		List<Module> modules = Arrays.asList(module);
+
+		condition.push("UNIX");
+
+		moduleProcessor.processTargetLinkLibraries(line, condition, modules);
+
+		assertTrue(module.getAffectedModules().contains("PocoFoundationmt"));
 	}
 
 }
