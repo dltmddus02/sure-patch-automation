@@ -193,7 +193,10 @@ public class CMakePreprocessor {
 	}
 
 	private Macro findFileMacro(String line) {
-		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE);
+//		file\\s*\\(\\s*\\w+\\s+(\\w+)\\s+(.+)\\s*\\)
+		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(\\w+)\\s+(.+)\\s*\\)",
+//		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(\\w+)\\s+(.+?)\\s*\\)",
+				Pattern.CASE_INSENSITIVE);
 //											  file <공백> (  <옵션> <매크로 이름> <암거나>  <암거나> ... ) 형태
 //											  file ( GLOB_RECURSE HDRS_G "include/*.h" )
 
@@ -207,19 +210,50 @@ public class CMakePreprocessor {
 			if (macroValue.contains("\"")) {
 				macroValue = macroValue.replaceAll("\"", "");
 			}
-			processWildcardPattern(macroValue);
 
 			List<String> macroValues = Arrays.asList(macroValue.split("\\s+")); // 띄어쓰기 기준으로 나눔
 
-			macro.setValue(macroValues);
+//			processWildcardPattern(macroValues);
+
+			// macro.setValue(processWildcardPattern(macroValues));
 			return macro;
 		}
 		return null;
 
 	}
 
-	private void processWildcardPattern(String macroValue) {
+	private List<String> processWildcardPattern(List<String> macroValues) {
+		List<String> copyMacroValues = macroValues.stream().map(v -> replaceMacro(v)).collect(Collectors.toList());
 
+		for (String macrovalue : copyMacroValues) {
+			if (macrovalue.contains("*")) {
+				int starIndex = macrovalue.indexOf('*');
+				int lastSlashIndex = macrovalue.lastIndexOf('/', starIndex);
+
+				String directory = lastSlashIndex != -1 ? macrovalue.substring(0, lastSlashIndex + 1) : ""; // 슬래시가 없으면
+																											// 빈 문자열로 처리
+				String pattern = macrovalue.substring(starIndex); // "*.h"
+
+				String cmakeCurrentSourceDir = macros.find("CMAKE_CURRENT_SOURCE_DIR").get(0);
+				File dir = new File(cmakeCurrentSourceDir + "\\" + directory);
+
+				if (dir.isDirectory()) { // 매크로 없이 걍 file(GLOB_RECURSE HDRS_G "include/*.h" ) 이런경우
+					for (File file : dir.listFiles()) {
+						if (file.isFile() && file.getName().matches(pattern.replace("*", ".*"))) {
+							copyMacroValues.add(file.getPath());
+						}
+					}
+				}
+//				else {
+//					경로가 없으면 ${CMAKE_CURRENT_SOURCE_DIR} 매크로 경로를 추가해서 다시 탐색해보고 없으면 그 때 오류 출력
+//					File dir2 = new File(cmakeCurrentSourceDir + "\\" + directory);
+//					if()
+//					System.out.println("디렉경로X");
+//				}
+			}
+		}
+
+		return copyMacroValues;
 	}
 
 	private Macro findProjectMacro(String line) {
@@ -275,6 +309,10 @@ public class CMakePreprocessor {
 
 			if (CodeLineUtil.isSetStatement(statement)) {
 				macros.add(findSetMacro(statement));
+//					System.out.println(statement);
+			}
+			if (CodeLineUtil.isFileStatement(statement)) {
+				macros.add(findFileMacro(statement));
 //					System.out.println(statement);
 			}
 			if (CodeLineUtil.isProjectStatememt(statement)) {
