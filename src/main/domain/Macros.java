@@ -52,7 +52,7 @@ public class Macros {
 
 	public void add(Macro macro) {
 		if (macro == null) {
-			System.out.println("macro 비어있어서 추가할 수 없습니다.");
+//			System.out.println("macro 비어있어서 추가할 수 없습니다.");
 			return;
 		}
 		if (!data.isEmpty()) {

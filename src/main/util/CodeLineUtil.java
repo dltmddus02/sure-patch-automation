@@ -15,6 +15,9 @@ public class CodeLineUtil {
 	public static boolean isTargetLinkLibrariesLine(String line) {
 		return (line.contains("target_link_libraries") || line.contains("TARGET_LINK_LIBRARIES"));
 	}
+//	public static boolean isTargetLinkLibrariesLine(String line) {
+//		return (line.contains("target_link_libraries") || line.contains("TARGET_LINK_LIBRARIES"));
+//	}
 
 	public static boolean isSetStatement(String line) {
 		Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);

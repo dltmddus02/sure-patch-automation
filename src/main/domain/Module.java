@@ -14,8 +14,8 @@ public class Module {
 	public Module(StringBuilder moduleName, String outputType) {
 		this.moduleName = moduleName;
 		this.outputType = outputType;
-		this.sourceFiles = new ArrayList<>();
 		this.setAffectedModules(new HashSet<>());
+		this.setSourceFiles(new ArrayList<>());
 	}
 
 	public String getModuleName() {
@@ -34,12 +34,15 @@ public class Module {
 		this.affectedModules = affectedModules;
 	}
 
-	public void addSourceFile(String sourceFile) {
-		sourceFiles.add(sourceFile);
+	public void setSourceFiles(ArrayList<String> sourceFiles) {
+		this.sourceFiles = sourceFiles;
 	}
 
 	public void addAffectedModule(String library) {
-		getAffectedModules().add(library);
+		affectedModules.add(library);
 	}
 
+	public void addSourceFile(String sourceFile) {
+		sourceFiles.add(sourceFile);
+	}
 }

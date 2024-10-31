@@ -18,8 +18,7 @@ public class ValidationUtil {
 		Pattern pattern = Pattern.compile(".*[\\W]+.*");
 		Matcher matcher = pattern.matcher(moduleName);
 
-		return moduleName.isEmpty() || moduleName.equals("PRIVATE") || moduleName.equals("PUBLIC")
-				|| matcher.matches();
+		return moduleName.isEmpty() || moduleName.equals("PRIVATE") || moduleName.equals("PUBLIC") || matcher.matches();
 	}
 
 }

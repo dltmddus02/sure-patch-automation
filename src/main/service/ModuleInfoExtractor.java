@@ -8,24 +8,29 @@ import main.util.ValidationUtil;
 
 public class ModuleInfoExtractor {
 	public void processAddExecutable(String line, List<Module> modules) {
-		String moduleName = ValidationUtil.getModuleName(line);
-		String[] moduleNames = moduleName.split(" ");
+		String moduleLine = ValidationUtil.getModuleName(line);
+		String[] moduleLines = moduleLine.split(" ");
 
-		String currentModuleName = moduleNames[0].trim();
+		String currentModuleName = moduleLines[0].trim();
 
 		String outputType = "EXE";
-		
+
 		System.out.println(line);
-		
+
 		Module module = new Module(new StringBuilder(currentModuleName), outputType);
+
+		for (int i = 1; i < moduleLines.length; i++) {
+			module.addSourceFile(moduleLines[i].trim());
+		}
+
 		modules.add(module);
 	}
 
 	public void processAddLibrary(String line, List<Module> modules) {
-		String moduleName = ValidationUtil.getModuleName(line);
-		String[] moduleNames = moduleName.split(" ");
+		String moduleLine = ValidationUtil.getModuleName(line);
+		String[] moduleLines = moduleLine.split(" ");
 
-		String currentModuleName = moduleNames[0].trim();
+		String currentModuleName = moduleLines[0].trim();
 
 		if (currentModuleName.startsWith("\"")) {
 			currentModuleName = deleteQuote(currentModuleName);
@@ -35,6 +40,11 @@ public class ModuleInfoExtractor {
 
 		if (outputType.equals("SHARED")) {
 			Module module = new Module(new StringBuilder(currentModuleName), outputType);
+			
+			for (int i = 1; i < moduleLines.length; i++) {
+				module.addSourceFile(moduleLines[i].trim());
+			}
+
 			modules.add(module);
 		}
 	}
@@ -68,9 +78,9 @@ public class ModuleInfoExtractor {
 		}
 	}
 
-	public void processAffectedSourceFiles() {
-		
-	}
+//	public void processSourceFiles(String line, List<Module> modules) {
+//
+//	}
 
 	private String deleteQuote(String moduleName) {
 		return moduleName.substring(1, moduleName.length() - 1);

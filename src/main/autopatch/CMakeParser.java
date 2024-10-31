@@ -38,6 +38,7 @@ public class CMakeParser {
 
 		private void recurseProcess(CMakeContents cmakeContents, File cmakeFile, List<Module> modules) {
 			processCMakeFile(cmakeContents, cmakeFile, modules);
+			
 
 			for (CMakeContents child : cmakeContents.getChildren()) {
 				String currentDirectory = child.getPath();
@@ -56,6 +57,7 @@ public class CMakeParser {
 //				 1. 모듈 이름 저장
 				if (CodeLineUtil.isAddExecutableLine(line)) {
 					moduleProcessor.processAddExecutable(line, modules);
+//					moduleProcessor.processSourceFiles(line, modules);
 				} else if (CodeLineUtil.isAddLibraryLine(line)) {
 					moduleProcessor.processAddLibrary(line, modules);
 				}
@@ -64,6 +66,9 @@ public class CMakeParser {
 				if (CodeLineUtil.isTargetLinkLibrariesLine(line)) {
 					moduleProcessor.processTargetLinkLibraries(line, condition, modules);
 				}
+				
+//				3. 소스파일 저장
+//				moduleProcessor.processSourceFiles(module);
 
 			}
 		}

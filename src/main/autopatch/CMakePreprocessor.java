@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -192,10 +196,8 @@ public class CMakePreprocessor {
 
 	}
 
-	private Macro findFileMacro(String line) {
-//		file\\s*\\(\\s*\\w+\\s+(\\w+)\\s+(.+)\\s*\\)
+	private Macro findFileMacro(String line) throws IOException {
 		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(\\w+)\\s+(.+)\\s*\\)",
-//		Pattern setPattern = Pattern.compile("file\\s*\\(\\s*(\\w+)\\s+(\\w+)\\s+(.+?)\\s*\\)",
 				Pattern.CASE_INSENSITIVE);
 //											  file <공백> (  <옵션> <매크로 이름> <암거나>  <암거나> ... ) 형태
 //											  file ( GLOB_RECURSE HDRS_G "include/*.h" )
@@ -205,55 +207,79 @@ public class CMakePreprocessor {
 
 		if (matcher.matches()) {
 			Macro macro = new Macro();
+			
+			if(!checkGlobOrGlobRecursion(matcher.group(1))) return null;
+			
 			macro.setKey(matcher.group(2));
 			String macroValue = matcher.group(3);
 			if (macroValue.contains("\"")) {
 				macroValue = macroValue.replaceAll("\"", "");
 			}
 
-			List<String> macroValues = Arrays.asList(macroValue.split("\\s+")); // 띄어쓰기 기준으로 나눔
+			List<String> macroValues = Arrays.asList(macroValue.split("\\s+"));
 
-//			processWildcardPattern(macroValues);
+			macro.setValue(processWildcardPattern(macroValues));
 
-			// macro.setValue(processWildcardPattern(macroValues));
 			return macro;
 		}
 		return null;
 
 	}
+	
+	private boolean checkGlobOrGlobRecursion(String s) {
+		return s.equals("GLOB") || s.equals("GLOB_RECURSE");
+	}
 
-	private List<String> processWildcardPattern(List<String> macroValues) {
-		List<String> copyMacroValues = macroValues.stream().map(v -> replaceMacro(v)).collect(Collectors.toList());
+	private List<String> processWildcardPattern(List<String> macroValues) throws IOException {
+		List<String> returnMacroValues = new ArrayList<>();
 
-		for (String macrovalue : copyMacroValues) {
+		for (String macrovalue : macroValues) {
+			boolean flag = true;
+			if (!macrovalue.contains("${") || !macrovalue.contains("}")) {
+				flag = false;
+			} else {
+				macrovalue = replaceMacro(macrovalue);
+			}
 			if (macrovalue.contains("*")) {
-				int starIndex = macrovalue.indexOf('*');
-				int lastSlashIndex = macrovalue.lastIndexOf('/', starIndex);
-
-				String directory = lastSlashIndex != -1 ? macrovalue.substring(0, lastSlashIndex + 1) : ""; // 슬래시가 없으면
-																											// 빈 문자열로 처리
-				String pattern = macrovalue.substring(starIndex); // "*.h"
-
-				String cmakeCurrentSourceDir = macros.find("CMAKE_CURRENT_SOURCE_DIR").get(0);
-				File dir = new File(cmakeCurrentSourceDir + "\\" + directory);
-
-				if (dir.isDirectory()) { // 매크로 없이 걍 file(GLOB_RECURSE HDRS_G "include/*.h" ) 이런경우
-					for (File file : dir.listFiles()) {
-						if (file.isFile() && file.getName().matches(pattern.replace("*", ".*"))) {
-							copyMacroValues.add(file.getPath());
-						}
-					}
+				int starIndex = macrovalue.indexOf("*");
+				String extractedPath = "";
+				
+				if (starIndex != -1) {
+					extractedPath = macrovalue.substring(0, starIndex);
+//					System.out.println("Extracted Path: " + extractedPath);
 				}
-//				else {
-//					경로가 없으면 ${CMAKE_CURRENT_SOURCE_DIR} 매크로 경로를 추가해서 다시 탐색해보고 없으면 그 때 오류 출력
-//					File dir2 = new File(cmakeCurrentSourceDir + "\\" + directory);
-//					if()
-//					System.out.println("디렉경로X");
-//				}
+
+				String pattern = macrovalue.substring(starIndex);
+
+				
+				Path path;
+				if (flag == true) {
+					path = Paths.get(extractedPath);
+				}
+				else {
+					String cmakeCurrentSourceDir = macros.find("CMAKE_CURRENT_SOURCE_DIR").get(0);
+					path = Paths.get(cmakeCurrentSourceDir + "\\" + extractedPath);
+				}
+				
+				DirectoryStream<Path> stream = Files.newDirectoryStream(path, pattern);
+				for (Path entry : stream) {
+					returnMacroValues.add(entry.toString());
+				}
+			}
+			else {
+				returnMacroValues.add(macrovalue);
 			}
 		}
 
-		return copyMacroValues;
+		return returnMacroValues;
+	}
+
+	public static String extractExtensionAfterWildcard(String path) {
+		int starIndex = path.indexOf("*");
+		if (starIndex != -1) {
+			return path.substring(starIndex + 1);
+		}
+		return "";
 	}
 
 	private Macro findProjectMacro(String line) {
