@@ -27,7 +27,6 @@ public class Main {
 			CMakeContents root = cmakePreprocessor.preprocess(topDirectory);
 			parser.parseCMakeFile(root, modules);
 			System.out.println("성공적으로 완료.");
-//			System.out.println(System.getenv("CMAKE_SOURCE_DIR"));
 		} catch (Exception e) {
 			System.err.println("실패: " + e.getMessage());
 		}
@@ -35,6 +34,6 @@ public class Main {
 		List<String> input = new ArrayList<>();
 //		중복 방지 set
 		Set<Module> output = new HashSet<>();
-		parser.findDependencies(input, output, modules);
+//		parser.findDependencies(input, output, modules);
 	}
 }
