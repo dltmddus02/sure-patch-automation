@@ -15,9 +15,6 @@ public class CodeLineUtil {
 	public static boolean isTargetLinkLibrariesLine(String line) {
 		return (line.contains("target_link_libraries") || line.contains("TARGET_LINK_LIBRARIES"));
 	}
-//	public static boolean isTargetLinkLibrariesLine(String line) {
-//		return (line.contains("target_link_libraries") || line.contains("TARGET_LINK_LIBRARIES"));
-//	}
 
 	public static boolean isSetStatement(String line) {
 		Pattern setPattern = Pattern.compile("set\\(.*\\)", Pattern.CASE_INSENSITIVE);
@@ -33,6 +30,13 @@ public class CodeLineUtil {
 		return matcher.matches();
 	}
 
+	public static boolean isPOCOStatement(String line) {
+		Pattern setPattern = Pattern.compile("POCO\\w*\\s*\\(.*\\)", Pattern.CASE_INSENSITIVE);
+		line = line.trim();
+		Matcher matcher = setPattern.matcher(line);
+		return matcher.matches();
+	}
+
 	public static boolean isProjectStatememt(String line) {
 		Pattern setPattern = Pattern.compile("project\\(.*\\)", Pattern.CASE_INSENSITIVE);
 		line = line.trim();
@@ -40,6 +44,13 @@ public class CodeLineUtil {
 		Matcher matcher = setPattern.matcher(line);
 
 		return matcher.matches();
+	}
+
+	public static boolean isAddSubDirectory(String line) {
+		if (line.contains("add_subdirectory")) {
+			return true;
+		}
+		return false;
 	}
 
 }
