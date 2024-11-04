@@ -40,13 +40,17 @@ public class ModuleInfoExtractor {
 
 		if (outputType.equals("SHARED")) {
 			Module module = new Module(new StringBuilder(currentModuleName), outputType);
-			
-			for (int i = 1; i < moduleLines.length; i++) {
+
+			for (int i = 2; i < moduleLines.length; i++) {
 				module.addSourceFile(moduleLines[i].trim());
 			}
 
 			modules.add(module);
 		}
+	}
+
+	private String deleteQuote(String moduleName) {
+		return moduleName.substring(1, moduleName.length() - 1);
 	}
 
 	public void processTargetLinkLibraries(String line, Condition condition, List<Module> modules) {
@@ -68,7 +72,7 @@ public class ModuleInfoExtractor {
 		}
 	}
 
-	public void processAffectedModules(Module module, String[] affectedModuleNames, String condition) {
+	private void processAffectedModules(Module module, String[] affectedModuleNames, String condition) {
 		for (int i = 1; i < affectedModuleNames.length; i++) {
 			String affectedModuleName = affectedModuleNames[i].trim();
 			if (ValidationUtil.isIgnorableModule(affectedModuleName, condition)) {
@@ -76,14 +80,6 @@ public class ModuleInfoExtractor {
 			}
 			module.addAffectedModule(affectedModuleName);
 		}
-	}
-
-//	public void processSourceFiles(String line, List<Module> modules) {
-//
-//	}
-
-	private String deleteQuote(String moduleName) {
-		return moduleName.substring(1, moduleName.length() - 1);
 	}
 
 }
