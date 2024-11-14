@@ -18,24 +18,24 @@ public class CMakeParser {
 			File cmakeFile = new File(root.getPath() + "\\CMakeLists.txt");
 			recurseProcess(root, cmakeFile, modules);
 
-			for (Module m : modules) {
-				System.out.println("모듈이름: " + m.getModuleName());
-				if (m.getAffectedModules().isEmpty()) {
-
-					continue;
-				}
-
-				for (String s : m.getAffectedModules()) {
-					System.out.println(s);
-				}
-				System.out.println("");
-			}
+//			for (Module m : modules) {
+//				System.out.println("모듈이름: " + m.getModuleName());
+//				if (m.getAffectedModules().isEmpty()) {
+//
+//					continue;
+//				}
+//
+//				for (String s : m.getAffectedModules()) {
+//					System.out.println(s);
+//				}
+//				System.out.println("");
+//			}
 		}
 
 		private void recurseProcess(CMakeContents cmakeContents, File cmakeFile, List<Module> modules) {
 			processCMakeFile(cmakeContents, cmakeFile, modules);
 
-			for (CMakeContents child : cmakeContents.getChildren()) {
+ 			for (CMakeContents child : cmakeContents.getChildren()) {
 				String currentDirectory = child.getPath();
 				File currentCMakeFile = new File(currentDirectory);
 				recurseProcess(child, currentCMakeFile, modules);
@@ -45,20 +45,22 @@ public class CMakeParser {
 		private void processCMakeFile(CMakeContents result, File cmakeFile, List<Module> modules) {
 			Condition condition = new Condition();
 
-			for (String line : result.getContents()) {
+			for (String statement : result.getContents()) {
 
-				storeConditionInfo(line, condition);
+				storeConditionInfo(statement, condition);
 
+				String currentPath = result.getPath();
+				
 //				 1. 모듈 이름, 참조 소스파일 저장
-				if (CodeLineUtil.isAddExecutableLine(line)) {
-					moduleProcessor.processAddExecutable(line, modules);
-				} else if (CodeLineUtil.isAddLibraryLine(line)) {
-					moduleProcessor.processAddLibrary(line, modules);
+				if (CodeLineUtil.isAddExecutableLine(statement)) {
+					moduleProcessor.processAddExecutable(statement, modules, currentPath);
+				} else if (CodeLineUtil.isAddLibraryLine(statement)) {
+					moduleProcessor.processAddLibrary(statement, modules, currentPath);
 				}
 
 //				2. 의존 모듈 저장
-				if (CodeLineUtil.isTargetLinkLibrariesLine(line)) {
-					moduleProcessor.processTargetLinkLibraries(line, condition, modules);
+				if (CodeLineUtil.isTargetLinkLibrariesLine(statement)) {
+					moduleProcessor.processTargetLinkLibraries(statement, condition, modules);
 				}
 
 			}
