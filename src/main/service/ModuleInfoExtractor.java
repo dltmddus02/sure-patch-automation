@@ -54,7 +54,8 @@ public class ModuleInfoExtractor {
 		}
 		if (!outputType.equals("STATIC")) {
 			for (int i = startIdx; i < moduleLines.length; i++) {
-				if(moduleLines[i].trim().equals("")) continue;
+				if (moduleLines[i].trim().equals(""))
+					continue;
 				String path = resolvePathForModuleLine(moduleLines[i], currentPath);
 				addSourceFiles(module, path, currentPath);
 			}
@@ -68,27 +69,31 @@ public class ModuleInfoExtractor {
 	}
 
 	private String resolvePathForModuleLine(String line, String currentPath) {
-		String resolvedPath = resolvePath(line.replace("\"", "").trim(), currentPath);
+		String resolvedPath = resolvePath(currentPath, line.replace("\"", "").trim());
 		return resolvedPath.replace("\"", "");
 	}
 
-	private void addSourceFiles(Module module, String path, String currentPath) {
-		List<String> validModuleLines = hasWildCardPath(path, currentPath);
+	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
+		List<String> validModuleLines = hasWildCardPath(path, currentAbsolutePath);
 		validModuleLines.forEach(validLine -> module.addSourceFile(validLine));
 	}
 
-	private String resolvePath(String currentPath, String path) {
+	private String resolvePath(String currentAbsolutePath, String path) {
 		Path resolvedPath;
 
+		// 경로 확인 전에 만약에 와일드카드 있으면?
+		if (path.contains("*")) {
+			return path;
+		}
 		// 상대 경로인 경우
 		if (!Paths.get(path).isAbsolute()) {
-			resolvedPath = Paths.get(currentPath).resolve(path).normalize();
+			resolvedPath = Paths.get(currentAbsolutePath, path).toAbsolutePath().normalize();
 		}
 		// 절대 경로인 경우
 		else {
 			resolvedPath = Paths.get(path).normalize();
 		}
-		return (resolvedPath + "\\" + currentPath).toString();
+		return (resolvedPath).toString();
 	}
 
 	private List<String> hasWildCardPath(String path, String currentPath) {
