@@ -36,8 +36,9 @@ class CMakeParserTest {
 		List<Module> modules = new ArrayList<>();
 
 		String line = "add_executable(Foundation ${SRC_PROJECT})";
+		String currentPath = "";
 
-		moduleProcessor.processAddExecutable(line, modules);
+		moduleProcessor.processAddExecutable(line, modules, currentPath);
 
 		String expectedModuleName = "Foundation";
 		String actualModuleName = modules.get(0).getModuleName();
@@ -55,8 +56,9 @@ class CMakeParserTest {
 		List<Module> modules = new ArrayList<>();
 
 		String line = "add_library(Foundation SHARED ${SRC_PROJECT} ${HEADER_FILES})";
-
-		moduleProcessor.processAddLibrary(line, modules);
+		String currentPath = "";
+		
+		moduleProcessor.processAddLibrary(line, modules, currentPath);
 
 		String expectedModuleName = "Foundation";
 		String actualModuleName = modules.get(0).getModuleName();
@@ -72,10 +74,11 @@ class CMakeParserTest {
 	@DisplayName("static library인 경우 모듈 정보 추출 검증")
 	void processAddLibrarySTATICTest() {
 		List<Module> modules = new ArrayList<>();
-
+		
 		String line = "add_library(${PROJECT_NAME} STATIC ${SRC_PROJECT} ${HEADER_FILES})";
+		String currentPath = "";
 
-		moduleProcessor.processAddLibrary(line, modules);
+		moduleProcessor.processAddLibrary(line, modules, currentPath);
 
 		assertTrue(modules.isEmpty(), "STATIC 라이브러리는 고려하지 않습니다.");
 	}
