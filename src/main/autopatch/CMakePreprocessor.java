@@ -54,9 +54,6 @@ public class CMakePreprocessor {
 		} finally {
 			macros.pop();
 		}
-
-//		macros.showMacros();
-
 		return result;
 	}
 
@@ -73,20 +70,6 @@ public class CMakePreprocessor {
 		macro.setValue(Arrays.asList(cMakeListPath));
 		return macro;
 	}
-//
-//	private Macro setCMakeModulePath(String cMakeListPath) {
-//		Macro macro = new Macro();
-//		macro.setKey("CMAKE_MODULE_PATH");
-//		macro.setValue(Arrays.asList(cMakeListPath));
-//		return macro;
-//	}
-//
-//	private Macro setCMakeCurrentListDir(String cMakeListPath) {
-//		Macro macro = new Macro();
-//		macro.setKey("CMAKE_CURRENT_LIST_DIR");
-//		macro.setValue(Arrays.asList(cMakeListPath));
-//		return macro;
-//	}
 
 	private List<String> read(String cMakeListPath) {
 		List<String> lineList = new ArrayList<>();

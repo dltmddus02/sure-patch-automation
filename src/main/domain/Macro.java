@@ -21,6 +21,4 @@ public class Macro {
 	public void setValue(List<String> value) {
 		this.value = value;
 	}
-
-
 }

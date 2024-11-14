@@ -145,25 +145,6 @@ public class ModuleInfoExtractor {
 					return;
 				}
 			}
-////				여기서 음... 모듈이 없는 경우는 새로 만들어야?
-//			Module m = getModuleByModuleName(modules, currentModuleName);
-//			if (m != null) {
-////					m.setIsTopModule();
-//				processAffectedModules(m, affectedModuleNames, c, modules);
-//				return;
-//			} else {
-//				// 만약 이미 정의된 모듈이 아니라면 추가하기
-//				m = new Module(new StringBuilder(currentModuleName), "");
-//				processAffectedModules(m, affectedModuleNames, c, modules);
-////				m.setIsTopModule();
-//				modules.add(m);
-//			}
-
-//			if (module.getModuleName().equals(currentModuleName)) {
-//				processAffectedModules(module, affectedModuleNames, c, modules);
-//				return;
-//			}
-//			}
 		}
 	}
 
