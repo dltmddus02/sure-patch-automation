@@ -4,3 +4,8 @@ project(
   DESCRIPTION "sub4"
 )
 
+add_executable(
+	${PROJECT_NAME}
+	${SRC_PROJECT}
+	d.cpp d.h
+)

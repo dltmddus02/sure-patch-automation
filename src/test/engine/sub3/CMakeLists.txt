@@ -5,5 +5,7 @@ project(
 )
 
 
-add_subdirectory(sub3-1)
-add_subdirectory(sub3-2)
+
+
+add_subdirectory(sub3_1)
+add_subdirectory(sub3_2)

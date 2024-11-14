@@ -6,4 +6,10 @@ project(
 
 sub2 root의 매크로 풀기 : POCO_MACRO : ${POCO_MACRO}
 
-add_subdirectory(sub2-1)
+add_library(
+	${PROJECT_NAME} STATIC	
+	${SOURCE_FILES}
+  	${HEADER_FILES}
+)
+
+add_subdirectory(sub2_1)
