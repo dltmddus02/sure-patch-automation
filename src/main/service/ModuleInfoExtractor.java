@@ -1,5 +1,12 @@
 package main.service;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import main.domain.Condition;
@@ -7,50 +14,114 @@ import main.domain.Module;
 import main.util.ValidationUtil;
 
 public class ModuleInfoExtractor {
-	public void processAddExecutable(String line, List<Module> modules) {
-		String moduleLine = ValidationUtil.getModuleName(line);
-		String[] moduleLines = moduleLine.split(" ");
 
-		String currentModuleName = moduleLines[0].trim();
-
+	public void processAddExecutable(String line, List<Module> modules, String currentPath) {
 		String outputType = "EXE";
+		int startIdx = 1;
 
-		System.out.println(line);
+		Module module = initializeModule(modules, line, currentPath, outputType, startIdx);
 
-		Module module = new Module(new StringBuilder(currentModuleName), outputType);
-
-		for (int i = 1; i < moduleLines.length; i++) {
-			module.addSourceFile(moduleLines[i].trim());
-		}
-
-		modules.add(module);
-	}
-
-	public void processAddLibrary(String line, List<Module> modules) {
-		String moduleLine = ValidationUtil.getModuleName(line);
-		String[] moduleLines = moduleLine.split(" ");
-
-		String currentModuleName = moduleLines[0].trim();
-
-		if (currentModuleName.startsWith("\"")) {
-			currentModuleName = deleteQuote(currentModuleName);
-		}
-
-		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "";
-
-		if (outputType.equals("SHARED")) {
-			Module module = new Module(new StringBuilder(currentModuleName), outputType);
-
-			for (int i = 2; i < moduleLines.length; i++) {
-				module.addSourceFile(moduleLines[i].trim());
-			}
-
+		if (module != null && !isModuleExists(modules, module)) {
 			modules.add(module);
 		}
 	}
 
-	private String deleteQuote(String moduleName) {
-		return moduleName.substring(1, moduleName.length() - 1);
+	public void processAddLibrary(String line, List<Module> modules, String currentPath) {
+		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "X";
+
+		int startIdx = 2;
+		Module module;
+
+		module = initializeModule(modules, line, currentPath, outputType, startIdx);
+		if (module != null && !isModuleExists(modules, module)) {
+			modules.add(module);
+		}
+	}
+
+	private Module initializeModule(List<Module> modules, String line, String currentPath, String outputType,
+			int startIdx) {
+		line = formatPath(line);
+
+		String moduleLine = ValidationUtil.getModuleName(line);
+		String[] moduleLines = moduleLine.split(" ");
+		String moduleName = removeQuotes(moduleLines[0].trim());
+
+		Module module = getModuleByModuleName(modules, moduleName);
+		if (module == null) {
+			module = new Module(new StringBuilder(moduleName), outputType);
+		} else {
+			module.setOutputType(outputType);
+		}
+		if (!outputType.equals("STATIC")) {
+			for (int i = startIdx; i < moduleLines.length; i++) {
+				if(moduleLines[i].trim().equals("")) continue;
+				String path = resolvePathForModuleLine(moduleLines[i], currentPath);
+				addSourceFiles(module, path, currentPath);
+			}
+		}
+
+		return module;
+	}
+
+	private String formatPath(String line) {
+		return line.replace("\\", "\\\\").replace("/", "\\\\");
+	}
+
+	private String resolvePathForModuleLine(String line, String currentPath) {
+		String resolvedPath = resolvePath(line.replace("\"", "").trim(), currentPath);
+		return resolvedPath.replace("\"", "");
+	}
+
+	private void addSourceFiles(Module module, String path, String currentPath) {
+		List<String> validModuleLines = hasWildCardPath(path, currentPath);
+		validModuleLines.forEach(validLine -> module.addSourceFile(validLine));
+	}
+
+	private String resolvePath(String currentPath, String path) {
+		Path resolvedPath;
+
+		// 상대 경로인 경우
+		if (!Paths.get(path).isAbsolute()) {
+			resolvedPath = Paths.get(currentPath).resolve(path).normalize();
+		}
+		// 절대 경로인 경우
+		else {
+			resolvedPath = Paths.get(path).normalize();
+		}
+		return (resolvedPath + "\\" + currentPath).toString();
+	}
+
+	private List<String> hasWildCardPath(String path, String currentPath) {
+		if (!path.contains("*"))
+			return Collections.singletonList(path);
+
+		List<String> returnMacroValues = new ArrayList<>();
+		String directoryPath = path.substring(0, path.indexOf("*"));
+
+		Path searchPath;
+		if (Files.exists(Paths.get(directoryPath))) {
+			searchPath = Paths.get(directoryPath);
+		} else {
+			searchPath = Paths.get(currentPath + "\\" + directoryPath);
+		}
+
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(searchPath, path.substring(path.indexOf("*")))) {
+			for (Path entry : stream) {
+				returnMacroValues.add(entry.toString());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return returnMacroValues;
+	}
+
+	private String removeQuotes(String moduleName) {
+		if (moduleName.startsWith("\"")) {
+			return moduleName.substring(1, moduleName.length() - 1);
+		} else {
+			return moduleName;
+		}
 	}
 
 	public void processTargetLinkLibraries(String line, Condition condition, List<Module> modules) {
@@ -65,21 +136,63 @@ public class ModuleInfoExtractor {
 			}
 			for (Module module : modules) {
 				if (module.getModuleName().equals(currentModuleName)) {
-					processAffectedModules(module, affectedModuleNames, c);
+					processAffectedModules(module, affectedModuleNames, c, modules);
 					return;
 				}
 			}
+////				여기서 음... 모듈이 없는 경우는 새로 만들어야?
+//			Module m = getModuleByModuleName(modules, currentModuleName);
+//			if (m != null) {
+////					m.setIsTopModule();
+//				processAffectedModules(m, affectedModuleNames, c, modules);
+//				return;
+//			} else {
+//				// 만약 이미 정의된 모듈이 아니라면 추가하기
+//				m = new Module(new StringBuilder(currentModuleName), "");
+//				processAffectedModules(m, affectedModuleNames, c, modules);
+////				m.setIsTopModule();
+//				modules.add(m);
+//			}
+
+//			if (module.getModuleName().equals(currentModuleName)) {
+//				processAffectedModules(module, affectedModuleNames, c, modules);
+//				return;
+//			}
+//			}
 		}
 	}
 
-	private void processAffectedModules(Module module, String[] affectedModuleNames, String condition) {
+	private void processAffectedModules(Module module, String[] affectedModuleNames, String condition,
+			List<Module> modules) {
 		for (int i = 1; i < affectedModuleNames.length; i++) {
 			String affectedModuleName = affectedModuleNames[i].trim();
 			if (ValidationUtil.isIgnorableModule(affectedModuleName, condition)) {
 				continue;
 			}
+			Module m = getModuleByModuleName(modules, affectedModuleName);
+			if (m != null) {
+				m.setIsTopModule();
+			} else {
+				// 만약 이미 정의된 모듈이 아니라면 추가하기
+				m = new Module(new StringBuilder(affectedModuleName), "");
+				m.setIsTopModule();
+				modules.add(m);
+			}
 			module.addAffectedModule(affectedModuleName);
 		}
 	}
 
+	public static Module getModuleByModuleName(List<Module> modules, String moduleName) {
+		for (Module module : modules) {
+			if (module.getModuleName().equals(moduleName)) {
+				return module;
+			}
+		}
+		return null;
+	}
+
+	public static boolean isModuleExists(List<Module> modules, Module newModule) {
+		return modules.stream().anyMatch(existingModule -> existingModule.getModuleName().toString()
+				.equals(newModule.getModuleName().toString()));
+	}
 }

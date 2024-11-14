@@ -1,10 +1,6 @@
 package main.service;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,11 +12,9 @@ import main.domain.Macro;
 import main.domain.Macros;
 
 public class MacroExtractor {
-	private Macros macros;
 	private MacroReplacer macroReplacer;
 
 	public MacroExtractor(Macros macros) {
-		this.macros = macros;
 		macroReplacer = new MacroReplacer(macros);
 	}
 
@@ -41,6 +35,7 @@ public class MacroExtractor {
 			List<String> macroValues = Arrays.stream(macroValue.split("\\s+")).map(String::trim)
 					.filter(s -> !s.isEmpty()).collect(Collectors.toList());
 
+//			checkValidValue(macroValues);
 			macro.setValue(macroValues);
 			return macro;
 		}
@@ -69,7 +64,9 @@ public class MacroExtractor {
 
 			List<String> macroValues = Arrays.asList(macroValue.split("\\s+"));
 
-			macro.setValue(processWildcardPattern(macroValues));
+			macroValues = resolveWildcardPattern(macroValues);
+//			macroValues = resolveParentDirectoryPath(macroValues);
+			macro.setValue(macroValues);
 
 			return macro;
 		}
@@ -81,41 +78,15 @@ public class MacroExtractor {
 		return s.equals("GLOB") || s.equals("GLOB_RECURSE");
 	}
 
-	private List<String> processWildcardPattern(List<String> macroValues) throws IOException {
+	private List<String> resolveWildcardPattern(List<String> macroValues) throws IOException {
 		List<String> returnMacroValues = new ArrayList<>();
 
 		for (String macrovalue : macroValues) {
-			boolean flag = true;
-			if (!macrovalue.contains("${") || !macrovalue.contains("}")) {
-				flag = false;
-			} else {
+			if (macrovalue.contains("${") || !macrovalue.contains("}")) {
 				macrovalue = macroReplacer.replaceMacro(macrovalue);
 			}
-			if (macrovalue.contains("*")) {
-				int starIndex = macrovalue.indexOf("*");
-				String extractedPath = "";
+			returnMacroValues.add(macrovalue);
 
-				if (starIndex != -1) {
-					extractedPath = macrovalue.substring(0, starIndex);
-				}
-
-				String pattern = macrovalue.substring(starIndex);
-
-				Path path;
-				if (flag == true) {
-					path = Paths.get(extractedPath);
-				} else {
-					String cmakeCurrentSourceDir = macros.find("CMAKE_CURRENT_SOURCE_DIR").get(0);
-					path = Paths.get(cmakeCurrentSourceDir + "\\" + extractedPath);
-				}
-
-				DirectoryStream<Path> stream = Files.newDirectoryStream(path, pattern);
-				for (Path entry : stream) {
-					returnMacroValues.add(entry.toString());
-				}
-			} else {
-				returnMacroValues.add(macrovalue);
-			}
 		}
 
 		return returnMacroValues;
