@@ -65,12 +65,12 @@ public class ModuleInfoExtractor {
 	}
 
 	private String formatPath(String line) {
-		return line.replace("\\", "\\\\").replace("/", "\\\\");
+		return line.replaceAll("[/\\\\]", "\\\\");
 	}
 
 	private String resolvePathForModuleLine(String line, String currentPath) {
 		String resolvedPath = resolvePath(currentPath, line.replace("\"", "").trim());
-		return resolvedPath.replace("\"", "");
+		return formatPath(resolvedPath.replace("\"", ""));
 	}
 
 	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
