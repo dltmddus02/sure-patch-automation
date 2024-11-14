@@ -43,14 +43,11 @@ class CMakePreprocessorTest {
 	@Test
 	@DisplayName("하위디렉토리_전처리_테스트")
 	void subdirectoryPreprocessorTest() throws IOException {
-		CMakeContents child1 = cmakePreprocessor.preprocess("src\\test\\engine\\sub1");
-		assertNotNull(child1);
-		assertEquals("src\\test\\engine\\sub1", child1.getPath());
-		assertFalse(child1.getContents().isEmpty());
+		CMakeContents root = cmakePreprocessor.preprocess("src\\test\\engine");
+		assertNotNull(root);
+		root.getChildren().forEach(child -> System.out.println(child.getPath()));
 
-		CMakeContents child2 = cmakePreprocessor.preprocess("src\\test\\engine\\sub2");
-		assertNotNull(child2);
-		assertEquals("src\\test\\engine\\sub2", child2.getPath());
+		assertEquals("src\\test\\engine\\sub3\\sub3-2", root.getChildren().get(2).getChildren().get(1).getPath());
 	}
 
 	@Test
