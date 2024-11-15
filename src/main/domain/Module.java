@@ -69,7 +69,7 @@ public class Module {
 		return isTopModule;
 	}
 
-	public void setIsTopModule() {
+	public void setIsTopModule(boolean flag) {
 		isTopModule = false;
 	}
 
