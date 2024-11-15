@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,6 +30,10 @@ public class ModuleInfoExtractor {
 	public void processAddLibrary(String line, List<Module> modules, String currentPath) {
 		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "X";
 
+//		if(line.contains("ALIAS")) {
+//			
+//		}
+
 		int startIdx = 2;
 		Module module;
 
@@ -43,7 +48,10 @@ public class ModuleInfoExtractor {
 		line = formatPath(line);
 
 		String moduleLine = ValidationUtil.getModuleName(line);
-		String[] moduleLines = moduleLine.split(" ");
+		String[] moduleLines = Arrays.stream(moduleLine.split("\\s+"))
+                .filter(str -> !str.isBlank())
+                .toArray(String[]::new);
+		
 		String moduleName = removeQuotes(moduleLines[0].trim());
 
 		Module module = getModuleByModuleName(modules, moduleName);
@@ -52,13 +60,16 @@ public class ModuleInfoExtractor {
 		} else {
 			module.setOutputType(outputType);
 		}
-		if (!outputType.equals("STATIC")) {
-			for (int i = startIdx; i < moduleLines.length; i++) {
-				if (moduleLines[i].trim().equals(""))
-					continue;
-				String path = resolvePathForModuleLine(moduleLines[i], currentPath);
-				addSourceFiles(module, path, currentPath);
-			}
+		for (int i = startIdx; i < moduleLines.length; i++) {
+			if (moduleLines[i].trim().equals(""))
+				continue;
+			String path = resolvePathForModuleLine(moduleLines[i], currentPath);
+			addSourceFiles(module, path, currentPath);
+		}
+
+		if (line.contains("ALIAS")) {
+			Module m = getModuleByModuleName(modules, removeQuotes(moduleLines[2]));
+			m.addAffectedModule(removeQuotes(moduleLines[0]));
 		}
 
 		return module;
@@ -78,7 +89,7 @@ public class ModuleInfoExtractor {
 		validModuleLines.forEach(validLine -> module.addSourceFile(validLine));
 	}
 
-	private String resolvePath(String currentAbsolutePath, String path) {
+	private String resolvePath(String currentAbsolutePath, String path) { // *.cpp
 		Path resolvedPath;
 
 		// 경로 확인 전에 만약에 와일드카드 있으면?
@@ -156,14 +167,12 @@ public class ModuleInfoExtractor {
 				continue;
 			}
 			Module m = getModuleByModuleName(modules, affectedModuleName);
-			if (m != null) {
-				m.setIsTopModule();
-			} else {
+			if (m == null) {
 				// 만약 이미 정의된 모듈이 아니라면 추가하기
 				m = new Module(new StringBuilder(affectedModuleName), "");
-				m.setIsTopModule();
 				modules.add(m);
 			}
+			m.setIsTopModule(false);
 			module.addAffectedModule(affectedModuleName);
 		}
 	}
