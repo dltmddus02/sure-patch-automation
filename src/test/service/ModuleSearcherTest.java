@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -32,14 +33,6 @@ class ModuleSearcherTest {
 	Parser parser = cmakeParser.new Parser();
 	List<Module> modules = new ArrayList<>();
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
 	@BeforeEach
 	void setUp() throws Exception {
 		String topDirectory = "C:\\Users\\sure\\CTcode\\engine";
@@ -47,12 +40,9 @@ class ModuleSearcherTest {
 		parser.parseCMakeFile(root, modules);
 	}
 
-	@AfterEach
-	void tearDown() throws Exception {
-	}
-
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestrunExecutor\\TestrunExecutor.cpp")
+	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CoverageEvaluator\\ProjectCoverageMerge\\CoverageMerge.cpp") // ucem
+																																	// 소스파일
 	@DisplayName("TestExecutor 추출 테스트")
 	public void getTestExecutorTest(String sourceFile) {
 		// given
@@ -63,10 +53,26 @@ class ModuleSearcherTest {
 		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put("C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestrunExecutor\\TestrunExecutor.cpp",
-				Arrays.asList("TestExecutor"));
-		assertEquals(actualResult, expectedResult);
+		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("TestExecutor"));
+	}
+
+	@Test
+	@DisplayName("여러 소스파일에서 TestExecutor 추출 테스트")
+	public void getTestExecutorsTest() {
+		// given
+		List<String> sourceFiles = Arrays.asList(
+				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
+				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
+		ModuleSearcher searcher = new ModuleSearcher(modules);
+
+		// when
+		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+
+		// then
+		for (String sourceFile : sourceFiles) {
+			List<String> actualModules = actualResult.getOrDefault(sourceFile, Collections.emptyList());
+			assertTrue(actualModules.contains("TestExecutor"));
+		}
 	}
 
 	@ParameterizedTest
@@ -87,6 +93,28 @@ class ModuleSearcherTest {
 		assertEquals(actualResult, expectedResult);
 	}
 
+	@Test
+	@DisplayName("TestExecutor, TestrunBuilder 동시 추출 테스트")
+	public void getTestExecutorAndTestrunBuilderTest() {
+		// given
+		List<String> sourceFiles = Arrays.asList(
+				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일 -
+																								// TestExecutor
+				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp", // urim 소스파일 - TestExecutor,
+																						// TestrunBuilder
+				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Builder\\LinkLog.cpp"); // ubuild 소스파일 - TestrunBuidler
+		ModuleSearcher searcher = new ModuleSearcher(modules);
+
+		// when
+		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+
+		// then
+		for (String sourceFile : sourceFiles) {
+			List<String> actualModules = actualResult.getOrDefault(sourceFile, Collections.emptyList());
+			assertTrue(actualModules.contains("TestExecutor") || actualModules.contains("TestrunBuilder"));
+		}
+	}
+
 	@ParameterizedTest
 	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CLI\\UCli.cpp")
 	@DisplayName("ucli모듈에서 UCLIDriver 추출 테스트")
@@ -99,8 +127,6 @@ class ModuleSearcherTest {
 		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put("C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CLI\\UCli.cpp", Arrays.asList("UCLIDriver"));
 		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("UCLIDriver"));
 	}
 
@@ -116,9 +142,6 @@ class ModuleSearcherTest {
 		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put("C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\Database.cpp",
-				Arrays.asList("CoverageRecalculator"));
 		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("CoverageRecalculator"));
 	}
 

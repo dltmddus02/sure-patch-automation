@@ -22,11 +22,15 @@ root / sub1 (sub4)
         	/ sub3-2 (sub4) / sub3-2-1
 	/ sub 4
 
+
+// 각 모듈의 <참조모듈 / 참조 소스파일>
 sub1 : sub4 / a.cpp a.h
 sub2-1 : sub3-2 / b.cpp b.h
 sub3-2 : sub4 / c.cpp c.h
-sub4 : d.cpp d.h // 이미 sub4는 탑모듈이 아니라서 d.cpp, d.h에 추가가 안 됨
+sub4 : d.cpp d.h
 
+
+// 각 소스파일들에 대해 최종적으로 나와야 하는 모듈
 a.cpp -> sub1
 b.cpp -> sub2-1
 c.cpp -> sub2-1
