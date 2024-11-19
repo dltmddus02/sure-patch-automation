@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -113,6 +110,21 @@ class ModuleSearcherTest {
 			List<String> actualModules = actualResult.getOrDefault(sourceFile, Collections.emptyList());
 			assertTrue(actualModules.contains("TestExecutor") || actualModules.contains("TestrunBuilder"));
 		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestCodeParser\\TestcodeSymbolUtil.h")
+	@DisplayName("헤더파일에서 TestExecutor 추출 테스트")
+	public void getTestExecutorFromHeaderTest(String sourceFile) {
+		// given
+		List<String> sourceFiles = Arrays.asList(sourceFile);
+		ModuleSearcher searcher = new ModuleSearcher(modules);
+
+		// when
+		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+
+		// then
+		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("TestExecutor"));
 	}
 
 	@ParameterizedTest
