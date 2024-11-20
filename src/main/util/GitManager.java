@@ -77,15 +77,15 @@ public class GitManager {
 	 * @param prevTagName
 	 * @return changed files
 	 */
-	public List<File> getChangedFiles(String productName, int patchVersion) {
-		List<File> changedFiles = new ArrayList<>();
+	public List<String> getChangedFiles(String productName, int patchVersion) {
+		List<String> changedFiles = new ArrayList<>();
 
 		String prevTag = productName + "." + (patchVersion - 1);
 
-//		String prevTagOrCommit = existsTag(prevTag) ? prevTag : findMergeBaseCommitHash();
+		String prevTagOrCommit = existsTag(prevTag) ? prevTag : findMergeBaseCommitHash();
 //		prevTag가 업슬 수 있음
 
-		String output = runGitCommand("git", "diff", "--name-status", prevTag, "HEAD");
+		String output = runGitCommand("git", "diff", "--name-status", prevTagOrCommit, "HEAD");
 		String[] lines = output.split("\n");
 
 		for (String line : lines) {
@@ -94,23 +94,35 @@ public class GitManager {
 				String status = parts[0];
 				String filePath = parts[1];
 				if (shouldAddToPatch(status, filePath)) {
-					changedFiles.add(new File(enginePath, filePath));
+					changedFiles.add(enginePath + filePath);
 				}
 			}
 		}
 
-		System.out.println(
-				"Changed files: " + changedFiles.stream().map(File::getPath).collect(Collectors.joining("\n")));
+//		System.out.println(
+//				"Changed files: " + changedFiles.stream().map(File::getPath).collect(Collectors.joining("\n")));
 
 		return changedFiles;
 	}
 
-	private boolean shouldAddToPatch(String status, String filePath) {
-		List<String> filePattern = List.of("bundles/", "features/"); // tests/, releng/ 변경사항 및 기타 파일은 패치에 반영하지 않음
-		List<String> validStatuses = List.of("A", "M", "R", "C"); // ADD, MODIFY, RENAME, COPY
+	/**
+	 * HEAD(release) 브랜치와 master 브랜치의 merge base commit hash를 반환한다. 이번 패치에 대한 태그가 없는
+	 * 경우, HEAD와 master 브랜치의 merge base commit hash를 반환한다.
+	 *
+	 * @return merge base commit hash
+	 */
+	public String findMergeBaseCommitHash() {
+		String result = runGitCommand("git", "merge-base", "HEAD", "master");
+		System.out.println("Merge base commit hash: " + result);
+		return result;
+	}
 
-		return validStatuses.contains(status) && filePattern.stream()
-				.anyMatch(path -> filePath.startsWith(path) && Paths.get(filePath).getNameCount() > 2);
+	private boolean shouldAddToPatch(String status, String filePath) {
+//		List<String> filePattern = List.of("bundles/", "features/"); // tests/, releng/ 변경사항 및 기타 파일은 패치에 반영하지 않음
+		List<String> validStatuses = List.of("A", "M", "R", "C"); // ADD, MODIFY, RENAME, COPY
+//		filePattern.stream()
+//		.anyMatch(path -> filePath.startsWith(path) 
+		return validStatuses.contains(status) && Paths.get(filePath).getNameCount() > 2;
 	}
 
 	/**
@@ -151,4 +163,5 @@ public class GitManager {
 	private boolean hasRemote() {
 		return !runGitCommand("git", "remote").isEmpty();
 	}
+
 }
