@@ -59,13 +59,13 @@ public class ModuleSearcher {
 		}
 	}
 
-	public Map<String, List<String>> getModuleNamesBySourceFiles(List<String> sourceFiles) {
+	public Set<String> getModuleNamesBySourceFiles(List<String> sourceFiles) {
 		Map<String, List<String>> result = new HashMap<>();
 		for (String sourceFile : sourceFiles) {
 			Set<String> moduleNames = getModuleNamesBySourceFile(sourceFile);
 			result.put(sourceFile, new ArrayList<>(moduleNames));
 		}
-		return (result);
+		return getResultModules(result);
 	}
 
 	public Set<String> getModuleNamesBySourceFile(String sourceFile) {
@@ -73,4 +73,13 @@ public class ModuleSearcher {
 		return sourceFileToModules.getOrDefault(sourcePath, Collections.emptySet());
 	}
 
+	public Set<String> getResultModules(Map<String, List<String>> modules){
+		Set<String> result = new HashSet<>();
+		for(List<String> list : modules.values()) {
+			for(String s : list) {
+				result.add(s);
+			}
+		}
+		return result;
+	}
 }
