@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,10 +46,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("TestExecutor"));
+		assertTrue(actualResult.contains("TestExecutor"));
 	}
 
 	@Test
@@ -63,13 +62,11 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		for (String sourceFile : sourceFiles) {
-			List<String> actualModules = actualResult.getOrDefault(sourceFile, Collections.emptyList());
-			assertTrue(actualModules.contains("TestExecutor"));
-		}
+		assertTrue(actualResult.contains("TestExecutor"));
+//		}
 	}
 
 	@ParameterizedTest
@@ -81,12 +78,11 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put("C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestrunBuilderDriver\\TestrunBuilder.cpp",
-				Arrays.asList("TestrunBuilder"));
+		Set<String> expectedResult = new HashSet<>();
+		expectedResult.addAll(Arrays.asList("TestrunBuilder"));
 		assertEquals(actualResult, expectedResult);
 	}
 
@@ -103,13 +99,11 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		for (String sourceFile : sourceFiles) {
-			List<String> actualModules = actualResult.getOrDefault(sourceFile, Collections.emptyList());
-			assertTrue(actualModules.contains("TestExecutor") || actualModules.contains("TestrunBuilder"));
-		}
+		assertTrue(actualResult.contains("TestExecutor") && actualResult.contains("TestrunBuilder"));
+//		}
 	}
 
 	@ParameterizedTest
@@ -121,10 +115,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("TestExecutor"));
+		assertTrue(actualResult.contains("TestExecutor"));
 	}
 
 	@ParameterizedTest
@@ -136,10 +130,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("UCLIDriver"));
+		assertTrue(actualResult.contains("UCLIDriver"));
 	}
 
 	@ParameterizedTest
@@ -151,10 +145,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		assertTrue(actualResult.getOrDefault(sourceFile, Collections.emptyList()).contains("CoverageRecalculator"));
+		assertTrue(actualResult.contains("CoverageRecalculator"));
 	}
 
 	@ParameterizedTest
@@ -166,13 +160,11 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put(
-				"C:\\Users\\sure\\CTcode\\engine\\src\\PA\\src\\TOOLS\\ArmCCInfoExtractor\\arm_cc_info_extractor.cpp",
-				Arrays.asList("armcc_config"));
+		Set<String> expectedResult = new HashSet<>();
+		expectedResult.addAll(Arrays.asList("armcc_config"));
 		assertEquals(actualResult, expectedResult);
 	}
 
@@ -185,13 +177,12 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Map<String, List<String>> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Map<String, List<String>> expectedResult = new HashMap<>();
-		expectedResult.put("C:\\Users\\sure\\CTcode\\engine\\src\\util\\UTIL_LIB\\cs_UTIL_hash.c",
-				Arrays.asList("TestRemoteUtil", "cop", "tce", "TestTinyRunner", "TestProjectImporter",
-						"MessageCodeExtractor", "TestCOP"));
+		Set<String> expectedResult = new HashSet<>();
+		expectedResult.addAll(Arrays.asList("TestRemoteUtil", "cop", "tce", "TestTinyRunner", "TestProjectImporter",
+				"MessageCodeExtractor", "TestCOP"));
 		assertEquals(actualResult, expectedResult);
 	}
 
