@@ -49,7 +49,7 @@ public class ArgumentParser {
 	}
 
 	private Entry<String, String> getArgEntry(String line) {
-		String[] keyValue = line.replace("\"", StringUtils.EMPTY).split(EQUAL, 2);
+		String[] keyValue = line.replace("\"", "").split(EQUAL, 2);
 		return Map.entry(keyValue[0], keyValue[1]);
 	}
 
