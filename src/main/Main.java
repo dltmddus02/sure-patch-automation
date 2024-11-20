@@ -51,18 +51,6 @@ public class Main {
 		new CommandExecutor(argumentParser.getRootPath(), argumentParser.getEnginePath(),
 				argumentParser.getPatchUtilityPath(), argumentParser.getDescription(), argumentParser.isOverwrite(),
 				modules).run();
-//		패치 대상 파일 식별
-//		PatchInfo patchInfo = new PatchInfo(new File(rootPath), isOverwrite); // 패치 생성 잘못 했을 때 덮어쓰기 할거면 isOverwrite == false
-//		List<File> changedFiles = GitManager.getInstance().getChangedFiles(patchInfo.getProductVersion(),
-//				patchInfo.getPatchVersion()); // 현재 패치 경로 이름, 현재 패치 버전
-//		platform platform.3
-
-//		////////////////////////////////
-//		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
-//
-//		List<String> changedFiles = List.of("C:\\Users\\sure\\CTcode\\engine\\src\\util\\UTIL_LIB\\cs_UTIL_hash.c");
-//		Set<String> resultModules = moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
-//		System.out.println("\n\n\n\nAffected Modules:" + resultModules);
 
 	}
 }

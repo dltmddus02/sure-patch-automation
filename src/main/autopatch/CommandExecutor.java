@@ -42,8 +42,6 @@ public class CommandExecutor {
 			e.printStackTrace();
 		}
 
-//		File outputDirPath = new File(new File(patchUtilityPath).getParentFile(),
-//				OUTPUT + "/" + patchInfo.getDisplayPatchVersion());
 		// 패치 대상 파일 식별
 		List<String> changedFiles = GitManager.getInstance().getChangedFiles(patchInfo.getProductVersion(),
 				patchInfo.getPatchVersion());
@@ -52,17 +50,14 @@ public class CommandExecutor {
 		
 		GitManager.getInstance().updateTag(patchInfo.getProductVersion(), patchInfo.getPatchVersion());
 
-        List<String> changedFilePaths = new ArrayList<>();
-//        for (File file : changedFiles) {
-//        	changedFilePaths.add(file.getPath());
-//        }
+//        List<String> changedFilePaths = new ArrayList<>();
         
         System.out.println(changedFiles);
         
 		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
 
-//		List<String> changedFiles = List.of("C:\\Users\\sure\\CTcode\\engine\\src\\util\\UTIL_LIB\\cs_UTIL_hash.c");
-		Set<String> resultModules = moduleSearcher.getModuleNamesBySourceFiles(changedFilePaths);
+		// 여기서 changedFiles 변경되어야 함
+		Set<String> resultModules = moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
 
 	}
 }
