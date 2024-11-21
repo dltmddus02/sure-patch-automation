@@ -1,4 +1,4 @@
-package main.autopatch;
+package main.service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,11 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import main.domain.CMakeContents;
-import main.domain.Macro;
-import main.domain.Macros;
-import main.service.MacroExtractor;
-import main.service.MacroReplacer;
+import main.model.CMakeContents;
+import main.model.Macro;
+import main.model.Macros;
 import main.util.CodeLineUtil;
 
 public class CMakePreprocessor {

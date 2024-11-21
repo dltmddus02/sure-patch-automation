@@ -1,4 +1,4 @@
-package main.autopatch;
+package main.service;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,6 +53,7 @@ public class ArgumentParser {
 		return Map.entry(keyValue[0], keyValue[1]);
 	}
 
+	
 	public String getEnginePath() {
 		return enginePath;
 	}
