@@ -1,4 +1,4 @@
-package main.domain;
+package main.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;

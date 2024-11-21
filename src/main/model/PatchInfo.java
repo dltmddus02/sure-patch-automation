@@ -1,4 +1,4 @@
-package main.domain;
+package main.model;
 
 import java.io.File;
 import java.io.IOException;
