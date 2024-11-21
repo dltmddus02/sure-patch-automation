@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import main.autopatch.CMakePreprocessor;
-import main.domain.CMakeContents;
+import main.model.CMakeContents;
+import main.service.CMakePreprocessor;
 
 class CMakePreprocessorTest {
 

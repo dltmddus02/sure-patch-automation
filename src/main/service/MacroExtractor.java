@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import main.domain.Macro;
-import main.domain.Macros;
+import main.model.Macro;
+import main.model.Macros;
 
 public class MacroExtractor {
 	private MacroReplacer macroReplacer;

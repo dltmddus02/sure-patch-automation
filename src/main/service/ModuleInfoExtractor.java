@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import main.domain.Condition;
-import main.domain.Module;
+import main.model.Condition;
+import main.model.Module;
 import main.util.ValidationUtil;
 
 public class ModuleInfoExtractor {
@@ -48,10 +48,9 @@ public class ModuleInfoExtractor {
 		line = formatPath(line);
 
 		String moduleLine = ValidationUtil.getModuleName(line);
-		String[] moduleLines = Arrays.stream(moduleLine.split("\\s+"))
-                .filter(str -> !str.isBlank())
-                .toArray(String[]::new);
-		
+		String[] moduleLines = Arrays.stream(moduleLine.split("\\s+")).filter(str -> !str.isBlank())
+				.toArray(String[]::new);
+
 		String moduleName = removeQuotes(moduleLines[0].trim());
 
 		Module module = getModuleByModuleName(modules, moduleName);

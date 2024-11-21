@@ -13,9 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import main.autopatch.CMakeParser;
-import main.domain.Condition;
-import main.domain.Module;
+import main.model.Condition;
+import main.model.Module;
+import main.service.CMakeParser;
 import main.service.ModuleInfoExtractor;
 
 class CMakeParserTest {
