@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import main.autopatch.CMakeParser;
-import main.autopatch.CMakeParser.Parser;
-import main.autopatch.CMakePreprocessor;
-import main.domain.CMakeContents;
-import main.domain.Module;
+import main.model.CMakeContents;
+import main.model.Module;
+import main.service.CMakeParser;
+import main.service.CMakePreprocessor;
 import main.service.ModuleSearcher;
+import main.service.CMakeParser.Parser;
 
 class ModuleSearcherTest {
 	CMakePreprocessor cmakePreprocessor = new CMakePreprocessor();
@@ -43,10 +43,11 @@ class ModuleSearcherTest {
 	public void getTestExecutorTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
@@ -59,10 +60,11 @@ class ModuleSearcherTest {
 		List<String> sourceFiles = Arrays.asList(
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
@@ -75,10 +77,11 @@ class ModuleSearcherTest {
 	public void getTestrunBuilderTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		Set<String> expectedResult = new HashSet<>();
@@ -96,10 +99,11 @@ class ModuleSearcherTest {
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp", // urim 소스파일 - TestExecutor,
 																						// TestrunBuilder
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Builder\\LinkLog.cpp"); // ubuild 소스파일 - TestrunBuidler
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor") && actualResult.contains("TestrunBuilder"));
@@ -112,10 +116,11 @@ class ModuleSearcherTest {
 	public void getTestExecutorFromHeaderTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
@@ -127,10 +132,11 @@ class ModuleSearcherTest {
 	public void getUCLIDriverTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("UCLIDriver"));
@@ -142,10 +148,11 @@ class ModuleSearcherTest {
 	public void getCoverageRecalculatorTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		assertTrue(actualResult.contains("CoverageRecalculator"));
@@ -157,10 +164,11 @@ class ModuleSearcherTest {
 	public void getArmccConfigTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		Set<String> expectedResult = new HashSet<>();
@@ -174,10 +182,11 @@ class ModuleSearcherTest {
 	public void getlibUTILLIB64Test(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
+		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles, rootPath);
 
 		// then
 		Set<String> expectedResult = new HashSet<>();
