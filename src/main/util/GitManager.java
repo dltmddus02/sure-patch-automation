@@ -82,7 +82,15 @@ public class GitManager {
 
 		String prevTag = productName + "." + (patchVersion - 1);
 
-		String prevTagOrCommit = existsTag(prevTag) ? prevTag : findMergeBaseCommitHash();
+		String prevTagOrCommit;
+
+		if (existsTag(prevTag)) {
+			prevTagOrCommit = prevTag;
+		} else {
+			prevTagOrCommit = findMergeBaseCommitHash();
+		}
+
+//		String prevTagOrCommit = existsTag(prevTag) ? prevTag : findMergeBaseCommitHash();
 //		prevTag가 업슬 수 있음
 
 		String output = runGitCommand("git", "diff", "--name-status", prevTagOrCommit, "HEAD");
@@ -94,7 +102,7 @@ public class GitManager {
 				String status = parts[0];
 				String filePath = parts[1];
 				if (shouldAddToPatch(status, filePath)) {
-					changedFiles.add(enginePath + filePath);
+					changedFiles.add(enginePath + "\\" + filePath);
 				}
 			}
 		}
@@ -120,8 +128,9 @@ public class GitManager {
 	private boolean shouldAddToPatch(String status, String filePath) {
 //		List<String> filePattern = List.of("bundles/", "features/"); // tests/, releng/ 변경사항 및 기타 파일은 패치에 반영하지 않음
 		List<String> validStatuses = List.of("A", "M", "R", "C"); // ADD, MODIFY, RENAME, COPY
-//		filePattern.stream()
-//		.anyMatch(path -> filePath.startsWith(path) 
+		boolean containsKorean = filePath.contains("\\") && filePath.matches(".*\\\\[0-9]{3}.*");
+		if (containsKorean)
+			return false;
 		return validStatuses.contains(status) && Paths.get(filePath).getNameCount() > 2;
 	}
 
@@ -152,6 +161,7 @@ public class GitManager {
 
 	private boolean existsTag(String tagName) {
 		if (hasRemote()) {
+//		if (false) {
 			String remoteOutput = runGitCommand("git", "ls-remote", "--tags", "origin");
 			return Arrays.stream(remoteOutput.split("\n")).anyMatch(line -> line.contains("refs/tags/" + tagName));
 		} else {
