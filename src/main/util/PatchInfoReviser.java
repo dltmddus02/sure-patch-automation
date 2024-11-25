@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.lang3.StringUtils;
 
-import main.domain.PatchInfo;
+import main.model.PatchInfo;
 
 /**
  * patch.info 파일을 입력한 description을 반영해서 수정해주는 메소드
