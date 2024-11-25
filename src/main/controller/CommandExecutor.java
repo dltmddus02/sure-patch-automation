@@ -42,8 +42,6 @@ public class CommandExecutor {
 
 			// 변경된 소스파일로 모듈 찾기
 			Set<String> resultModules = extractModulesByChangedFiles(changedFiles);
-//			Set<String> resultModules = extractModulesByChangedFiles(
-//					Arrays.asList("C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp"));
 
 			System.out.println("resultModules: " + resultModules);
 		} catch (IOException e) {
@@ -63,7 +61,7 @@ public class CommandExecutor {
 
 	private Set<String> extractModulesByChangedFiles(List<String> changedFiles) {
 		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
-		return moduleSearcher.getModuleNamesBySourceFiles(changedFiles, rootPath);
+		return moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
 	}
 
 }

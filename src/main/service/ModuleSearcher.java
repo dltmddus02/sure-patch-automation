@@ -60,21 +60,9 @@ public class ModuleSearcher {
 		}
 	}
 
-	public Set<String> getModuleNamesBySourceFiles(List<String> sourceFiles, String rootPath) {
-
+	public Set<String> getModuleNamesBySourceFiles(List<String> sourceFiles) { // C:\Users\sure\CTcode-test\engine\src/PA/build/unix/CFE/Makefile
 		Map<String, List<String>> result = new HashMap<>();
-		Path basePath = Paths.get(rootPath);
-		for (String sourceFile : sourceFiles) {
-//            List<String> relativePaths = new ArrayList<>();
-//            Path basePath = Paths.get(rootPath);
-//            for (String absPath : absolutePaths) {
-			Path abs = Paths.get(sourceFile);
-			Path relativePath = basePath.relativize(abs);
-			sourceFile = relativePath.toString();
-//                relativePaths.add(relativePath.toString());
-//            }
-
-//			sourceFile = 
+		for (String sourceFile : sourceFiles) { // sourceFile안에 mo
 			Set<String> moduleNames = getModuleNamesBySourceFile(sourceFile);
 			result.put(sourceFile, new ArrayList<>(moduleNames));
 		}
@@ -83,7 +71,20 @@ public class ModuleSearcher {
 
 	public Set<String> getModuleNamesBySourceFile(String sourceFile) {
 		Path sourcePath = Paths.get(sourceFile);
-		return sourceFileToModules.getOrDefault(sourcePath, Collections.emptySet());
+
+		Set<String> result = new HashSet<>();
+
+		for (Map.Entry<Path, Set<String>> entry : sourceFileToModules.entrySet()) {
+			Path keyPath = entry.getKey();
+
+			if (sourcePath.toString().contains(keyPath.toString())) {
+				result.addAll(entry.getValue());
+			}
+		}
+		if (result.isEmpty()) {
+			return Collections.emptySet();
+		}
+		return result;
 	}
 
 	public Set<String> getResultModules(Map<String, List<String>> modules) {
