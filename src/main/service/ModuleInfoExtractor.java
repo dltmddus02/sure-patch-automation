@@ -30,10 +30,6 @@ public class ModuleInfoExtractor {
 	public void processAddLibrary(String line, List<Module> modules, String currentPath) {
 		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "X";
 
-//		if(line.contains("ALIAS")) {
-//			
-//		}
-
 		int startIdx = 2;
 		Module module;
 
@@ -83,11 +79,6 @@ public class ModuleInfoExtractor {
 		return formatPath(resolvedPath.replace("\"", ""));
 	}
 
-	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
-		List<String> validModuleLines = hasWildCardPath(path, currentAbsolutePath);
-		validModuleLines.forEach(validLine -> module.addSourceFile(validLine));
-	}
-
 	private String resolvePath(String currentAbsolutePath, String path) { // *.cpp
 		Path resolvedPath;
 
@@ -104,6 +95,12 @@ public class ModuleInfoExtractor {
 			resolvedPath = Paths.get(path).normalize();
 		}
 		return (resolvedPath).toString();
+	}
+
+	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
+		List<String> validModuleLines = hasWildCardPath(path, currentAbsolutePath);
+
+		validModuleLines.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "engine")));
 	}
 
 	private List<String> hasWildCardPath(String path, String currentPath) {
@@ -129,6 +126,15 @@ public class ModuleInfoExtractor {
 		}
 
 		return returnMacroValues;
+	}
+
+	private String getRelativePath(String fullPath, String baseWord) {
+		int baseIndex = fullPath.indexOf(baseWord);
+
+		if (baseIndex == -1) {
+			return fullPath;
+		}
+		return fullPath.substring(baseIndex + baseWord.length() + 1);
 	}
 
 	private String removeQuotes(String moduleName) {
