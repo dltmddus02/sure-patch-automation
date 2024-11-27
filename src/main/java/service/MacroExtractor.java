@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import main.model.Macro;
-import main.model.Macros;
+import main.java.model.Macro;
+import main.java.model.Macros;
 
 public class MacroExtractor {
 	private MacroReplacer macroReplacer;

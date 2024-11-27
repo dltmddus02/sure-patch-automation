@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import main.model.Module;
+import main.java.model.Module;
 
 public class ModuleSearcher {
 	private List<Module> modules;

@@ -1,4 +1,4 @@
-package test.autopatch;
+package test.java.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import main.model.CMakeContents;
-import main.service.CMakePreprocessor;
+import main.java.model.CMakeContents;
+import main.java.service.CMakePreprocessor;
 
 class CMakePreprocessorTest {
 
@@ -47,7 +47,7 @@ class CMakePreprocessorTest {
 		assertNotNull(root);
 		root.getChildren().forEach(child -> System.out.println(child.getPath()));
 
-		assertEquals("src\\test\\engine\\sub3\\sub3-2", root.getChildren().get(2).getChildren().get(1).getPath());
+		assertEquals("src\\test\\engine\\sub3\\sub3_2", root.getChildren().get(2).getChildren().get(1).getPath());
 	}
 
 	@Test

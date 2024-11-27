@@ -1,4 +1,4 @@
-package test.service;
+package test.java.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import main.model.CMakeContents;
-import main.model.Module;
-import main.service.CMakeParser;
-import main.service.CMakePreprocessor;
-import main.service.ModuleSearcher;
-import main.service.CMakeParser.Parser;
+import main.java.model.CMakeContents;
+import main.java.model.Module;
+import main.java.service.CMakeParser;
+import main.java.service.CMakePreprocessor;
+import main.java.service.ModuleSearcher;
+import main.java.service.CMakeParser.Parser;
 
 class ModuleSearcherTest {
 	CMakePreprocessor cmakePreprocessor = new CMakePreprocessor();
@@ -38,12 +38,10 @@ class ModuleSearcherTest {
 
 	@ParameterizedTest
 	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CoverageEvaluator\\ProjectCoverageMerge\\CoverageMerge.cpp") // ucem
-																																	// 소스파일
 	@DisplayName("TestExecutor 추출 테스트")
 	public void getTestExecutorTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -60,7 +58,6 @@ class ModuleSearcherTest {
 		List<String> sourceFiles = Arrays.asList(
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -77,7 +74,6 @@ class ModuleSearcherTest {
 	public void getTestrunBuilderTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -99,7 +95,6 @@ class ModuleSearcherTest {
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp", // urim 소스파일 - TestExecutor,
 																						// TestrunBuilder
 				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Builder\\LinkLog.cpp"); // ubuild 소스파일 - TestrunBuidler
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -116,7 +111,6 @@ class ModuleSearcherTest {
 	public void getTestExecutorFromHeaderTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -132,7 +126,6 @@ class ModuleSearcherTest {
 	public void getUCLIDriverTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -148,7 +141,6 @@ class ModuleSearcherTest {
 	public void getCoverageRecalculatorTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -164,7 +156,6 @@ class ModuleSearcherTest {
 	public void getArmccConfigTest(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -182,7 +173,6 @@ class ModuleSearcherTest {
 	public void getlibUTILLIB64Test(String sourceFile) {
 		// given
 		List<String> sourceFiles = Arrays.asList(sourceFile);
-//		String rootPath = "C:\\Users\\sure\\CTcode\\engine\\";
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when

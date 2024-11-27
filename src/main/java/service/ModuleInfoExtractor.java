@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import main.model.Condition;
-import main.model.Module;
-import main.util.ValidationUtil;
+import main.java.model.Condition;
+import main.java.model.Module;
+import main.java.util.ValidationUtil;
 
 public class ModuleInfoExtractor {
 

@@ -1,16 +1,15 @@
-package main.controller;
+package main.java.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import main.model.Module;
-import main.model.PatchInfo;
-import main.service.ModuleSearcher;
-import main.util.GitManager;
-import main.util.PatchInfoReviser;
+import main.java.model.Module;
+import main.java.model.PatchInfo;
+import main.java.service.ModuleSearcher;
+import main.java.util.GitManager;
+import main.java.util.PatchInfoReviser;
 
 public class CommandExecutor {
 	private String rootPath;

@@ -1,12 +1,12 @@
-package main.service;
+package main.java.service;
 
 import java.io.File;
 import java.util.List;
 
-import main.model.CMakeContents;
-import main.model.Condition;
-import main.model.Module;
-import main.util.CodeLineUtil;
+import main.java.model.CMakeContents;
+import main.java.model.Condition;
+import main.java.model.Module;
+import main.java.util.CodeLineUtil;
 
 public class CMakeParser {
 

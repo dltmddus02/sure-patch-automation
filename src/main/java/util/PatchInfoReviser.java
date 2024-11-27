@@ -1,4 +1,4 @@
-package main.util;
+package main.java.util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.lang3.StringUtils;
 
-import main.model.PatchInfo;
+import main.java.model.PatchInfo;
 
 /**
  * patch.info 파일을 입력한 description을 반영해서 수정해주는 메소드

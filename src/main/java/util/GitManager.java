@@ -1,4 +1,4 @@
-package main.util;
+package main.java.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -118,6 +118,10 @@ public class GitManager {
 	 * 경우, HEAD와 master 브랜치의 merge base commit hash를 반환한다.
 	 *
 	 * @return merge base commit hash
+	 * 
+	 * 
+	 * 
+	 * 
 	 */
 	public String findMergeBaseCommitHash() {
 		String result = runGitCommand("git", "merge-base", "HEAD", "master");
@@ -160,8 +164,8 @@ public class GitManager {
 	}
 
 	private boolean existsTag(String tagName) {
-		if (hasRemote()) {
-//		if (false) {
+//		if (hasRemote()) { // 지금은 엔진 원격저장소에 태그가 없어서 이 부분 실행안됨
+		if (false) {
 			String remoteOutput = runGitCommand("git", "ls-remote", "--tags", "origin");
 			return Arrays.stream(remoteOutput.split("\n")).anyMatch(line -> line.contains("refs/tags/" + tagName));
 		} else {

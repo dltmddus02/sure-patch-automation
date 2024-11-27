@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import main.model.CMakeContents;
-import main.model.Macro;
-import main.model.Macros;
-import main.util.CodeLineUtil;
+import main.java.model.CMakeContents;
+import main.java.model.Macro;
+import main.java.model.Macros;
+import main.java.util.CodeLineUtil;
 
 public class CMakePreprocessor {
 	private Stack<List<Macro>> data;

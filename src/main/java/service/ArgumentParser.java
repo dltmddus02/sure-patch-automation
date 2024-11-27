@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.util.Map;
 import java.util.Map.Entry;

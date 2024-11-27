@@ -1,4 +1,4 @@
-package main.service;
+package main.java.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import main.model.Macros;
+import main.java.model.Macros;
 
 public class MacroReplacer {
 	private Macros macros;

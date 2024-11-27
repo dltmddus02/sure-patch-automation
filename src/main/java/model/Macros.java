@@ -1,4 +1,4 @@
-package main.model;
+package main.java.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ public class Macros {
 
 	public void pop() {
 		if (!data.isEmpty()) {
-//	    	System.out.println("pop!");
 			data.pop();
 		}
 	}

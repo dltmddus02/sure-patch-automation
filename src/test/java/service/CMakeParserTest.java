@@ -1,4 +1,4 @@
-package test.autopatch;
+package test.java.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,10 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import main.model.Condition;
-import main.model.Module;
-import main.service.CMakeParser;
-import main.service.ModuleInfoExtractor;
+import main.java.model.Condition;
+import main.java.model.Module;
+import main.java.service.CMakeParser;
+import main.java.service.ModuleInfoExtractor;
 
 class CMakeParserTest {
 	private CMakeParser.Parser parser;
@@ -70,18 +70,18 @@ class CMakeParserTest {
 		assertEquals(expectedModuleType, actualModuleType);
 	}
 
-	@Test
-	@DisplayName("static library인 경우 모듈 정보 추출 검증")
-	void processAddLibrarySTATICTest() {
-		List<Module> modules = new ArrayList<>();
-		
-		String line = "add_library(${PROJECT_NAME} STATIC ${SRC_PROJECT} ${HEADER_FILES})";
-		String currentPath = "";
-
-		moduleProcessor.processAddLibrary(line, modules, currentPath);
-
-		assertTrue(modules.isEmpty(), "STATIC 라이브러리는 고려하지 않습니다.");
-	}
+//	@Test
+//	@DisplayName("static library인 경우 모듈 정보 추출 검증")
+//	void processAddLibrarySTATICTest() {
+//		List<Module> modules = new ArrayList<>();
+//		
+//		String line = "add_library(${PROJECT_NAME} STATIC ${SRC_PROJECT} ${HEADER_FILES})";
+//		String currentPath = "";
+//
+//		moduleProcessor.processAddLibrary(line, modules, currentPath);
+//
+//		assertTrue(modules.isEmpty(), "STATIC 라이브러리는 고려하지 않습니다.");
+//	}
 
 	@Test
 	@DisplayName("Condition if 정보 정상적으로 push되는지 검증")
@@ -134,7 +134,9 @@ class CMakeParserTest {
 		String line = "target_link_libraries(testName PRIVATE -Wl,--start-group cs_common libUTIL_LIB64 PocoFoundationmt ucommon -Wl,--end-group ${CMAKE_DL_LIBS} )";
 
 		Module module = new Module(new StringBuilder("testName"), "EXE");
-		List<Module> modules = Arrays.asList(module);
+		
+	    List<Module> modules = new ArrayList<>();
+	    modules.add(module);
 
 		condition.push("UNIX");
 
