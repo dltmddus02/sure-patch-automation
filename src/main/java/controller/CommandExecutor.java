@@ -50,7 +50,7 @@ public class CommandExecutor {
 
 	private PatchInfo revisePatchInfo() throws IOException {
 		PatchInfo patchInfo = new PatchInfo(new File(rootPath), isOverwrite);
-		new PatchInfoReviser(patchInfo, description).execute();
+//		new PatchInfoReviser(patchInfo, description).execute();
 		return patchInfo;
 	}
 
