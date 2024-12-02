@@ -1,61 +1,35 @@
 package main.java.controller;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import main.java.model.Module;
-import main.java.model.PatchInfo;
 import main.java.service.ModuleSearcher;
-import main.java.util.GitManager;
-import main.java.util.PatchInfoReviser;
 
 public class CommandExecutor {
-	private String rootPath;
-	private String enginePath;
-	private String patchUtilityPath;
-	private String description;
-	private boolean isOverwrite;
+	private String changedSourceFiles;
 	private List<Module> modules;
 
-	public CommandExecutor(String rootPath, String enginePath, String patchUtilityPath, String description,
-			boolean isOverwrite, List<Module> modules) {
-		this.rootPath = rootPath;
-		this.enginePath = enginePath;
-		this.patchUtilityPath = patchUtilityPath;
-		this.description = description;
-		this.isOverwrite = isOverwrite;
+	public CommandExecutor(String changedSourceFiles, List<Module> modules) {
+		this.changedSourceFiles = changedSourceFiles;
 		this.modules = modules;
 	}
 
 	public void run() {
-		try {
-			// patch.info 생성 및 수정
-			PatchInfo patchInfo = revisePatchInfo();
+		// changedSourceFiles 쉼표(,) 기준으로 분리 후 List로 저장
+		List<String> changedFiles = parseChangedSourceFiles(changedSourceFiles);
 
-			// 변경된 소스파일 검색
-			List<String> changedFiles = findChangedFiles(patchInfo);
+		System.out.println("changedFiles: " + changedFiles);
 
-			System.out.println("changedFiles: " + changedFiles);
+		// 변경된 소스파일로 모듈 찾기
+		Set<String> resultModules = extractModulesByChangedFiles(changedFiles);
 
-			// 변경된 소스파일로 모듈 찾기
-			Set<String> resultModules = extractModulesByChangedFiles(changedFiles);
-
-			System.out.println("resultModules: " + resultModules);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		System.out.println("resultModules: " + resultModules);
 	}
 
-	private PatchInfo revisePatchInfo() throws IOException {
-		PatchInfo patchInfo = new PatchInfo(new File(rootPath), isOverwrite);
-//		new PatchInfoReviser(patchInfo, description).execute();
-		return patchInfo;
-	}
-
-	private List<String> findChangedFiles(PatchInfo patchInfo) {
-		return GitManager.getInstance().getChangedFiles(patchInfo.getProductVersion(), patchInfo.getPatchVersion());
+	private List<String> parseChangedSourceFiles(String changedSourceFiles) {
+		return Arrays.stream(changedSourceFiles.split(",")).map(String::trim).toList();
 	}
 
 	private Set<String> extractModulesByChangedFiles(List<String> changedFiles) {
