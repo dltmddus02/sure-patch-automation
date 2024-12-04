@@ -82,7 +82,6 @@ public class ModuleInfoExtractor {
 	private String resolvePath(String currentAbsolutePath, String path) { // *.cpp
 		Path resolvedPath;
 
-		// 경로 확인 전에 만약에 와일드카드 있으면?
 		if (path.contains("*")) {
 			return path;
 		}
@@ -99,8 +98,14 @@ public class ModuleInfoExtractor {
 
 	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
 		List<String> validModuleLines = hasWildCardPath(path, currentAbsolutePath);
-
-		validModuleLines.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "engine")));
+	    
+		/* 
+	    build_engine_GIT_window 기준으로 경로 수정
+	    
+	    예) C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\src\\ut\\COMMON\\Args\\Args.cpp
+	    -> src\\ut\\COMMON\\Args\\Args.cpp
+	    */
+		validModuleLines.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "build_engine_GIT_window")));
 	}
 
 	private List<String> hasWildCardPath(String path, String currentPath) {
@@ -173,7 +178,6 @@ public class ModuleInfoExtractor {
 			}
 			Module m = getModuleByModuleName(modules, affectedModuleName);
 			if (m == null) {
-				// 만약 이미 정의된 모듈이 아니라면 추가하기
 				m = new Module(new StringBuilder(affectedModuleName), "");
 				modules.add(m);
 			}

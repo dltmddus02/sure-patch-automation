@@ -62,7 +62,7 @@ public class ModuleSearcher {
 
 	public Set<String> getModuleNamesBySourceFiles(List<String> sourceFiles) { // C:\Users\sure\CTcode-test\engine\src/PA/build/unix/CFE/Makefile
 		Map<String, List<String>> result = new HashMap<>();
-		for (String sourceFile : sourceFiles) { // sourceFile안에 mo
+		for (String sourceFile : sourceFiles) {
 			Set<String> moduleNames = getModuleNamesBySourceFile(sourceFile);
 			result.put(sourceFile, new ArrayList<>(moduleNames));
 		}
