@@ -1,6 +1,7 @@
 # 엔진 바이너리 패치 자동화 프로그램
 
-변경된 소스파일을 참고해 빌드할 모듈을 자동으로 추출하는 프로그래미. 해당 repository를 클론받은 후 사용할 수 있습니다.
+- 변경된 소스파일을 참고해 빌드할 모듈을 자동으로 추출하는 프로그램입니다. 
+- 해당 repository를 클론받은 후 사용할 수 있습니다.
 
 ## 사용 방법
 
@@ -37,7 +38,7 @@ java -jar build_engine_patch_finder.jar "-enginePath=C:\01.jenkins\agent\workspa
 
 ## gradle 설치 버전 안내
 
-현재 해당 프로그램은 Gradle 8.10.2, JDK 17을 사용합니다.
+해당 프로그램은 Gradle 8.10.2, JDK 17을 사용합니다.
 아래 명령어를 입력해서 gradle이 정상적으로 설치되었는지 확인할 수 있습니다.
 ```
 gradle -v
