@@ -60,13 +60,16 @@ public class ModuleSearcher {
 		}
 	}
 
-	public Set<String> getModuleNamesBySourceFiles(List<String> sourceFiles) { // C:\Users\sure\CTcode-test\engine\src/PA/build/unix/CFE/Makefile
+	public String getModuleNamesBySourceFiles(List<String> sourceFiles) { // C:\Users\sure\CTcode-test\engine\src/PA/build/unix/CFE/Makefile
 		Map<String, List<String>> result = new HashMap<>();
 		for (String sourceFile : sourceFiles) {
 			Set<String> moduleNames = getModuleNamesBySourceFile(sourceFile);
 			result.put(sourceFile, new ArrayList<>(moduleNames));
 		}
-		return getResultModules(result);
+		
+		Set<String> resultModules = getResultModules(result);
+		return resultModulesFomatter(resultModules);
+//		return getResultModules(result);
 	}
 
 	public Set<String> getModuleNamesBySourceFile(String sourceFile) {
@@ -95,5 +98,9 @@ public class ModuleSearcher {
 			}
 		}
 		return result;
+	}
+
+	private String resultModulesFomatter(Set<String> resultModules) {
+		return String.join(" ", resultModules);
 	}
 }

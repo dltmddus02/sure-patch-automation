@@ -30,8 +30,7 @@ public class CommandExecutor {
 			List<Module> modules = preprocessModules(enginePath);
 
 			// 변경된 파일들로부터 변경될 모듈들 가져오기
-//			List<String> changedFiles = parseChangedSourceFiles(changedSourceFiles);
-			Set<String> resultModules = extractModulesByChangedFiles(changedSourceFiles, modules);
+			String resultModules = extractModulesByChangedFiles(changedSourceFiles, modules);
 
 			System.out.println("결과 모듈: " + resultModules);
 		} catch (Exception e) {
@@ -54,11 +53,7 @@ public class CommandExecutor {
 		return modules;
 	}
 
-//	private List<String> parseChangedSourceFiles(String changedSourceFiles) {
-//		return Arrays.stream(changedSourceFiles.split(",")).map(String::trim).toList();
-//	}
-
-	private Set<String> extractModulesByChangedFiles(List<String> changedFiles, List<Module> modules) {
+	private String extractModulesByChangedFiles(List<String> changedFiles, List<Module> modules) {
 		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
 		return moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
 	}
