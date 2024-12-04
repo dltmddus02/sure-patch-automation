@@ -16,12 +16,17 @@ gradle clean build -x test
 ```
 3. 커맨드의 예시는 다음과 같습니다.
 ```
-java -jar build_engine_patch_finder.jar "-enginePath=C:\01.jenkins\agent\workspace\build_engine_GIT_window" "-changedSourceFiles=GIT_window\src\ut\UnitTest\TestUT\TestUtMain.cpp, src\util\UTIL_LIB\cs_UTIL_hash.c"
+java -jar build_engine_patch_finder.jar "-enginePath=C:\01.jenkins\agent\workspace\build_engine_GIT_window" "-changedSourceFiles=src\util\UTIL_LIB\cs_UTIL_hash.c, src\ut\COMMON\Args\Args.cpp, src\util\POCO_LIB\Foundation\zlib"
 ```
 4. 실행 결과
-입력한 changedSourceFiles 소스파일들이 영향을 미치는 엔진 바이너리들이 Set<String> 형태로 리턴됩니다.
+changedSourceFiles이 영향을 미치는 엔진 바이너리들이 Set\<String> 형태로 리턴됩니다.
 ```
-예시 changedSourceFiles에 대한 실행 결과
+changedSourceFiles = "src\util\UTIL_LIB\cs_UTIL_hash.c", 
+"src\ut\COMMON\Args\Args.cpp", 
+"src\util\POCO_LIB\Foundation\zlib"
+```
+에 대한 결과
+```
 [TestExecutor, TestUTCP, TestUCLI, cop, IntegrationTest, TestrunBuilderTest, TestUT, TestRemoteUtil, CoverageRecalculator, tce, TestTinyRunner, TestProjectImporter, Foundation, MessageCodeExtractor, rcli, TestrunBuilder, TestCOP, UCLIDriver, TestExecutorTest]
 ```
 
@@ -32,8 +37,3 @@ java -jar build_engine_patch_finder.jar "-enginePath=C:\01.jenkins\agent\workspa
 ```
 gradle -v
 ```
-
-
-리턴 타입이랑 리턴되는 데이터 예시
-gradle 빌드 과정을 좀 더 자세히 
-초심자가 본다고 생각하고, gradle 버전 몇을 설치해서 커맨드라인에서 어떤 명령어로 수행하면 되는지.
