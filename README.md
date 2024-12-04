@@ -19,20 +19,21 @@ gradle clean build -x test
 java -jar build_engine_patch_finder.jar "-enginePath=C:\01.jenkins\agent\workspace\build_engine_GIT_window" "-changedSourceFiles=src\util\UTIL_LIB\cs_UTIL_hash.c, src\ut\COMMON\Args\Args.cpp, src\util\POCO_LIB\Foundation\zlib"
 ```
 4. 전체 프로그램 흐름
-input
-```
-enginePath = "C:\01.jenkins\agent\workspace\build_engine_GIT_window"
 
-changedSourceFiles = "src\util\UTIL_LIB\cs_UTIL_hash.c", 
-			"src\ut\COMMON\Args\Args.cpp", 
-			"src\util\POCO_LIB\Foundation\zlib"
-```
-output
-```
-// changedSourceFiles이 영향을 미치는 엔진 바이너리들이 Set<String> 형태로 리턴됩니다.
-
-[TestExecutor, TestUTCP, TestUCLI, cop, IntegrationTest, TestrunBuilderTest, TestUT, TestRemoteUtil, CoverageRecalculator, tce, TestTinyRunner, TestProjectImporter, Foundation, MessageCodeExtractor, rcli, TestrunBuilder, TestCOP, UCLIDriver, TestExecutorTest]
-```
+	- input
+	```
+	enginePath = "C:\01.jenkins\agent\workspace\build_engine_GIT_window"
+	
+	changedSourceFiles = "src\util\UTIL_LIB\cs_UTIL_hash.c", 
+				"src\ut\COMMON\Args\Args.cpp", 
+				"src\util\POCO_LIB\Foundation\zlib"
+	```
+	- output
+	```
+	// changedSourceFiles이 영향을 미치는 엔진 바이너리들이 Set<String> 형태로 리턴됩니다.
+	
+	[TestExecutor, TestUTCP, TestUCLI, cop, IntegrationTest, TestrunBuilderTest, TestUT, TestRemoteUtil, CoverageRecalculator, tce, TestTinyRunner, TestProjectImporter, Foundation, MessageCodeExtractor, rcli, TestrunBuilder, TestCOP, UCLIDriver, TestExecutorTest]
+	```
 
 ## gradle 설치 버전 안내
 
