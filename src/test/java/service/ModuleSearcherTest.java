@@ -31,13 +31,13 @@ class ModuleSearcherTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		String topDirectory = "C:\\Users\\sure\\CTcode\\engine";
+		String topDirectory = "C:\\Users\\sure\\CTcode\\build_engine_GIT_window";
 		CMakeContents root = cmakePreprocessor.preprocess(topDirectory);
 		parser.parseCMakeFile(root, modules);
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CoverageEvaluator\\ProjectCoverageMerge\\CoverageMerge.cpp") // ucem
+	@ValueSource(strings = "src\\ut\\CoverageEvaluator\\ProjectCoverageMerge\\CoverageMerge.cpp") // ucem
 	@DisplayName("TestExecutor 추출 테스트")
 	public void getTestExecutorTest(String sourceFile) {
 		// given
@@ -45,7 +45,7 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
@@ -56,12 +56,12 @@ class ModuleSearcherTest {
 	public void getTestExecutorsTest() {
 		// given
 		List<String> sourceFiles = Arrays.asList(
-				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
-				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
+				"src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
+				"src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
@@ -69,7 +69,7 @@ class ModuleSearcherTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestrunBuilderDriver\\TestrunBuilder.cpp")
+	@ValueSource(strings = "src\\ut\\TestrunBuilderDriver\\TestrunBuilder.cpp")
 	@DisplayName("TestrunBuilder 추출 테스트")
 	public void getTestrunBuilderTest(String sourceFile) {
 		// given
@@ -77,12 +77,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Set<String> expectedResult = new HashSet<>();
-		expectedResult.addAll(Arrays.asList("TestrunBuilder"));
-		assertEquals(actualResult, expectedResult);
+		assertEquals(actualResult, "TestrunBuilder");
 	}
 
 	@Test
@@ -90,15 +88,13 @@ class ModuleSearcherTest {
 	public void getTestExecutorAndTestrunBuilderTest() {
 		// given
 		List<String> sourceFiles = Arrays.asList(
-				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일 -
-																								// TestExecutor
-				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\RimUtil.cpp", // urim 소스파일 - TestExecutor,
-																						// TestrunBuilder
-				"C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Builder\\LinkLog.cpp"); // ubuild 소스파일 - TestrunBuidler
+				"src\\ut\\TestEngine\\RunnableExecutorSm.cpp",  // uecm 소스파일 - TestExecutor
+				"src\\ut\\Repository\\RimUtil.cpp", 			// urim 소스파일 - TestExecutor, TestrunBuilder
+				"src\\ut\\Builder\\LinkLog.cpp"); 				// ubuild 소스파일 - TestrunBuidler
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor") && actualResult.contains("TestrunBuilder"));
@@ -106,7 +102,7 @@ class ModuleSearcherTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\TestCodeParser\\TestcodeSymbolUtil.h")
+	@ValueSource(strings = "src\\ut\\TestCodeParser\\TestcodeSymbolUtil.h")
 	@DisplayName("헤더파일에서 TestExecutor 추출 테스트")
 	public void getTestExecutorFromHeaderTest(String sourceFile) {
 		// given
@@ -114,14 +110,14 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("TestExecutor"));
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\CLI\\UCli.cpp")
+	@ValueSource(strings = "src\\ut\\CLI\\UCli.cpp")
 	@DisplayName("ucli모듈에서 UCLIDriver 추출 테스트")
 	public void getUCLIDriverTest(String sourceFile) {
 		// given
@@ -129,14 +125,14 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("UCLIDriver"));
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\ut\\Repository\\Database.cpp")
+	@ValueSource(strings = "src\\ut\\Repository\\Database.cpp")
 	@DisplayName("CoverageRecalculator 추출 테스트")
 	public void getCoverageRecalculatorTest(String sourceFile) {
 		// given
@@ -144,14 +140,14 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		assertTrue(actualResult.contains("CoverageRecalculator"));
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\PA\\src\\TOOLS\\ArmCCInfoExtractor\\arm_cc_info_extractor.cpp")
+	@ValueSource(strings = "src\\PA\\src\\TOOLS\\ArmCCInfoExtractor\\arm_cc_info_extractor.cpp")
 	@DisplayName("armcc_config 추출 테스트")
 	public void getArmccConfigTest(String sourceFile) {
 		// given
@@ -159,16 +155,16 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
 		Set<String> expectedResult = new HashSet<>();
 		expectedResult.addAll(Arrays.asList("armcc_config"));
-		assertEquals(actualResult, expectedResult);
+		assertEquals(actualResult, "armcc_config");
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = "C:\\Users\\sure\\CTcode\\engine\\src\\util\\UTIL_LIB\\cs_UTIL_hash.c")
+	@ValueSource(strings = "src\\util\\UTIL_LIB\\cs_UTIL_hash.c")
 	@DisplayName("libUTIL_LIB64 추출 테스트")
 	public void getlibUTILLIB64Test(String sourceFile) {
 		// given
@@ -176,12 +172,10 @@ class ModuleSearcherTest {
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
-		Set<String> actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
+		String actualResult = searcher.getModuleNamesBySourceFiles(sourceFiles);
 
 		// then
-		Set<String> expectedResult = new HashSet<>();
-		expectedResult.addAll(Arrays.asList("TestRemoteUtil", "cop", "tce", "TestTinyRunner", "TestProjectImporter",
-				"MessageCodeExtractor", "TestCOP"));
+		String expectedResult = "TestRemoteUtil cop tce TestTinyRunner TestProjectImporter MessageCodeExtractor TestCOP";
 		assertEquals(actualResult, expectedResult);
 	}
 
