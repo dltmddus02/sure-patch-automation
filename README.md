@@ -24,12 +24,12 @@ input
 enginePath = "C:\01.jenkins\agent\workspace\build_engine_GIT_window"
 
 changedSourceFiles = "src\util\UTIL_LIB\cs_UTIL_hash.c", 
-						"src\ut\COMMON\Args\Args.cpp", 
-						"src\util\POCO_LIB\Foundation\zlib"
+			"src\ut\COMMON\Args\Args.cpp", 
+			"src\util\POCO_LIB\Foundation\zlib"
 ```
 output
 ```
-// changedSourceFiles이 영향을 미치는 엔진 바이너리들이 Set\<String> 형태로 리턴됩니다.
+// changedSourceFiles이 영향을 미치는 엔진 바이너리들이 Set<String> 형태로 리턴됩니다.
 
 [TestExecutor, TestUTCP, TestUCLI, cop, IntegrationTest, TestrunBuilderTest, TestUT, TestRemoteUtil, CoverageRecalculator, tce, TestTinyRunner, TestProjectImporter, Foundation, MessageCodeExtractor, rcli, TestrunBuilder, TestCOP, UCLIDriver, TestExecutorTest]
 ```
