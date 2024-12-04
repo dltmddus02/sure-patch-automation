@@ -11,4 +11,6 @@
 - changedSourceFiles : 변경된 소스파일들의 절대경로를 쉼표로 구분해 입력합니다.
 ```
 3. 커맨드의 예시는 다음과 같습니다.
-`java -jar "C:\01.jenkins\agent\workspace\build_engine_patch_finder\build\libs\build_engine_patch_finder.jar" "-enginePath=C:\01.jenkins\agent\workspace\build_engine_GIT_window" "-changedSourceFiles=GIT_window\src\ut\UnitTest\TestUT\TestUtMain.cpp, src\util\UTIL_LIB\cs_UTIL_hash.c"`
+```
+java -jar "C:\01.jenkins\agent\workspace\build_engine_patch_finder\build\libs\build_engine_patch_finder.jar" "-enginePath=C:\01.jenkins\agent\workspace\build_engine_GIT_window" "-changedSourceFiles=GIT_window\src\ut\UnitTest\TestUT\TestUtMain.cpp, src\util\UTIL_LIB\cs_UTIL_hash.c"
+```
