@@ -1,18 +1,14 @@
 package main.java.service;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArgumentParser {
-	private static final String ENGINE_PATH_OPTION = "-enginePath";
-	private static final String CHANGED_SOURCE_FILES = "-changedSourceFiles";
-
-	private static final String EQUAL = "=";
-
 	private String enginePath;
-	private String changedSourceFiles;
+	private List<String> changedSourceFiles;
 
 	public ArgumentParser(String[] args) {
+		this.changedSourceFiles = new ArrayList<>();
 		parse(args);
 	}
 
@@ -23,28 +19,19 @@ public class ArgumentParser {
 	 */
 	private void parse(String[] args) {
 		for (String arg : args) {
-
-			Entry<String, String> argEntry = getArgEntry(arg);
-
-			switch (argEntry.getKey()) {
-			case ENGINE_PATH_OPTION -> this.enginePath = argEntry.getValue();
-			case CHANGED_SOURCE_FILES -> this.changedSourceFiles = argEntry.getValue();
-			default -> throw new IllegalArgumentException("Unexpected value: " + getArgEntry(arg));
+			if (arg.startsWith("enginePath=")) {
+				this.enginePath = arg.substring("enginePath=".length());
+			} else {
+				this.changedSourceFiles.add(arg);
 			}
-
 		}
-	}
-
-	private Entry<String, String> getArgEntry(String line) {
-		String[] keyValue = line.replace("\"", "").split(EQUAL, 2);
-		return Map.entry(keyValue[0], keyValue[1]);
 	}
 
 	public String getEnginePath() {
 		return enginePath;
 	}
 
-	public String getChangedSourceFiles() {
+	public List<String> getChangedSourceFiles() {
 		return changedSourceFiles;
 	}
 

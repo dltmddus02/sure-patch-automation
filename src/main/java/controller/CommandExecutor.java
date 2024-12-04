@@ -24,14 +24,14 @@ public class CommandExecutor {
 			// 파라미터에서 경로와 변경된 소스 파일 가져오기
 			ArgumentParser argumentParser = new ArgumentParser(args);
 			String enginePath = argumentParser.getEnginePath();
-			String changedSourceFiles = argumentParser.getChangedSourceFiles();
+			List<String> changedSourceFiles = argumentParser.getChangedSourceFiles();
 
 			// 모듈 전처리
-			List<Module> modules = preprocessModules(enginePath, changedSourceFiles);
+			List<Module> modules = preprocessModules(enginePath);
 
 			// 변경된 파일들로부터 변경될 모듈들 가져오기
-			List<String> changedFiles = parseChangedSourceFiles(changedSourceFiles);
-			Set<String> resultModules = extractModulesByChangedFiles(changedFiles, modules);
+//			List<String> changedFiles = parseChangedSourceFiles(changedSourceFiles);
+			Set<String> resultModules = extractModulesByChangedFiles(changedSourceFiles, modules);
 
 			System.out.println("결과 모듈: " + resultModules);
 		} catch (Exception e) {
@@ -40,16 +40,7 @@ public class CommandExecutor {
 		}
 	}
 
-	private List<String> parseChangedSourceFiles(String changedSourceFiles) {
-		return Arrays.stream(changedSourceFiles.split(",")).map(String::trim).toList();
-	}
-
-	private Set<String> extractModulesByChangedFiles(List<String> changedFiles, List<Module> modules) {
-		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
-		return moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
-	}
-
-	private List<Module> preprocessModules(String topDirectory, String changedSourceFiles) throws Exception {
+	private List<Module> preprocessModules(String topDirectory) throws Exception {
 		CMakePreprocessor cmakePreprocessor = new CMakePreprocessor();
 		CMakeParser cmakeParser = new CMakeParser();
 		CMakeParser.Parser parser = cmakeParser.new Parser();
@@ -57,9 +48,19 @@ public class CommandExecutor {
 		List<Module> modules = new ArrayList<>();
 		CMakeContents root = cmakePreprocessor.preprocess(topDirectory);
 		parser.parseCMakeFile(root, modules);
-		
+
 		Module.printAllModuleNamesAndReferences(modules);
 
 		return modules;
 	}
+
+//	private List<String> parseChangedSourceFiles(String changedSourceFiles) {
+//		return Arrays.stream(changedSourceFiles.split(",")).map(String::trim).toList();
+//	}
+
+	private Set<String> extractModulesByChangedFiles(List<String> changedFiles, List<Module> modules) {
+		ModuleSearcher moduleSearcher = new ModuleSearcher(modules);
+		return moduleSearcher.getModuleNamesBySourceFiles(changedFiles);
+	}
+
 }
