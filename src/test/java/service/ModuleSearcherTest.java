@@ -3,11 +3,16 @@ package test.java.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +28,7 @@ import main.java.service.ModuleSearcher;
 import main.java.service.CMakeParser.Parser;
 
 class ModuleSearcherTest {
+	String topDirectory;
 	CMakePreprocessor cmakePreprocessor = new CMakePreprocessor();
 
 	CMakeParser cmakeParser = new CMakeParser();
@@ -31,7 +37,7 @@ class ModuleSearcherTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		String topDirectory = "C:\\Users\\sure\\CTcode\\build_engine_GIT_window";
+		topDirectory = "C:\\Users\\sure\\CTcode\\build_engine_GIT_window";
 		CMakeContents root = cmakePreprocessor.preprocess(topDirectory);
 		parser.parseCMakeFile(root, modules);
 	}
@@ -55,8 +61,7 @@ class ModuleSearcherTest {
 	@DisplayName("여러 소스파일에서 TestExecutor 추출 테스트")
 	public void getTestExecutorsTest() {
 		// given
-		List<String> sourceFiles = Arrays.asList(
-				"src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
+		List<String> sourceFiles = Arrays.asList("src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일
 				"src\\ut\\Repository\\RimUtil.cpp"); // urim 소스파일
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
@@ -87,10 +92,10 @@ class ModuleSearcherTest {
 	@DisplayName("TestExecutor, TestrunBuilder 동시 추출 테스트")
 	public void getTestExecutorAndTestrunBuilderTest() {
 		// given
-		List<String> sourceFiles = Arrays.asList(
-				"src\\ut\\TestEngine\\RunnableExecutorSm.cpp",  // uecm 소스파일 - TestExecutor
-				"src\\ut\\Repository\\RimUtil.cpp", 			// urim 소스파일 - TestExecutor, TestrunBuilder
-				"src\\ut\\Builder\\LinkLog.cpp"); 				// ubuild 소스파일 - TestrunBuidler
+		List<String> sourceFiles = Arrays.asList("src\\ut\\TestEngine\\RunnableExecutorSm.cpp", // uecm 소스파일 -
+																								// TestExecutor
+				"src\\ut\\Repository\\RimUtil.cpp", // urim 소스파일 - TestExecutor, TestrunBuilder
+				"src\\ut\\Builder\\LinkLog.cpp"); // ubuild 소스파일 - TestrunBuidler
 		ModuleSearcher searcher = new ModuleSearcher(modules);
 
 		// when
@@ -177,6 +182,36 @@ class ModuleSearcherTest {
 		// then
 		String expectedResult = "TestRemoteUtil cop tce TestTinyRunner TestProjectImporter MessageCodeExtractor TestCOP";
 		assertEquals(actualResult, expectedResult);
+	}
+
+	@Test
+	@DisplayName("GLOB_RECURSE 옵션 사용하는 Data모듈의 소스파일 추출 테스트")
+	public void GlobRecurseTest() throws IOException {
+		// given
+		Path dir = Paths.get(topDirectory + "\\src\\util\\POCO_LIB\\Data\\include");
+
+		List<String> expectedFiles = Files.walk(dir).filter(path -> path.toString().endsWith(".h")).map(Path::toString)
+				.collect(Collectors.toList());
+
+		List<String> finalExpectedFiles = new ArrayList<>();
+		for (String expectedFile : expectedFiles) {
+			int baseIndex = expectedFile.indexOf(topDirectory);
+			finalExpectedFiles.add(expectedFile.substring(baseIndex + topDirectory.length() + 1));
+
+		}
+
+		// when
+		Module DataModule = modules.stream().filter(module -> module.getModuleName().equals("Data")).findFirst()
+				.orElse(null);
+		List<String> actualSourceFiles = DataModule.getSourceFiles();
+
+		System.out.println(finalExpectedFiles);
+		System.out.println(actualSourceFiles);
+
+		// then
+		for (String expectedFile : finalExpectedFiles) {
+			assertTrue(actualSourceFiles.contains(expectedFile), "Missing expected file: " + expectedFile);
+		}
 	}
 
 }
