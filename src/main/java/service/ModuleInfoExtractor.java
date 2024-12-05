@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import main.java.model.Condition;
 import main.java.model.Module;
@@ -98,29 +99,53 @@ public class ModuleInfoExtractor {
 
 	private void addSourceFiles(Module module, String path, String currentAbsolutePath) {
 		List<String> validModuleLines = hasWildCardPath(path, currentAbsolutePath);
-	    
-		/* 
-	    build_engine_GIT_window 기준으로 경로 수정
-	    
-	    예) C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\src\\ut\\COMMON\\Args\\Args.cpp
-	    -> src\\ut\\COMMON\\Args\\Args.cpp
-	    */
-		validModuleLines.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "build_engine_GIT_window")));
+
+		/*
+		 * build_engine_GIT_window 기준으로 경로 수정
+		 * 
+		 * 예)
+		 * C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\src\\ut\\COMMON\\
+		 * Args\\Args.cpp -> src\\ut\\COMMON\\Args\\Args.cpp
+		 */
+		validModuleLines
+				.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "build_engine_GIT_window")));
 	}
 
 	private List<String> hasWildCardPath(String path, String currentPath) {
-		if (!path.contains("*"))
-			return Collections.singletonList(path);
+		if (path.startsWith("GLOB_RECURSE-")) {
+			return getRecursiveFilePaths(path, currentPath);
+		}
 
+		if (!path.contains("*")) {
+			return Collections.singletonList(path);
+		}
+
+		return getMatchingFilePaths(path, currentPath);
+	}
+
+	private List<String> getRecursiveFilePaths(String path, String currentPath) {
+		String directoryPath = path.substring("GLOB_RECURSE-".length(), path.indexOf("*"));
+		List<String> returnMacroValues = new ArrayList<>();
+
+		Path searchPath = getSearchPath(directoryPath, currentPath);
+
+		try {
+			String extension = path.substring(path.lastIndexOf("*") + 1);
+			try (Stream<Path> paths = Files.walk(searchPath)) {
+				paths.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(extension))
+						.forEach(p -> returnMacroValues.add(p.toString()));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return returnMacroValues;
+	}
+
+	private List<String> getMatchingFilePaths(String path, String currentPath) {
 		List<String> returnMacroValues = new ArrayList<>();
 		String directoryPath = path.substring(0, path.indexOf("*"));
 
-		Path searchPath;
-		if (Files.exists(Paths.get(directoryPath))) {
-			searchPath = Paths.get(directoryPath);
-		} else {
-			searchPath = Paths.get(currentPath + "\\" + directoryPath);
-		}
+		Path searchPath = getSearchPath(directoryPath, currentPath);
 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(searchPath, path.substring(path.indexOf("*")))) {
 			for (Path entry : stream) {
@@ -131,6 +156,14 @@ public class ModuleInfoExtractor {
 		}
 
 		return returnMacroValues;
+	}
+
+	private Path getSearchPath(String directoryPath, String currentPath) {
+		if (Files.exists(Paths.get(directoryPath))) {
+			return Paths.get(directoryPath);
+		} else {
+			return Paths.get(currentPath + "\\" + directoryPath);
+		}
 	}
 
 	private String getRelativePath(String fullPath, String baseWord) {
