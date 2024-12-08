@@ -69,10 +69,9 @@ public class ModuleSearcher {
 		
 		Set<String> resultModules = getResultModules(result);
 		return resultModulesFomatter(resultModules);
-//		return getResultModules(result);
 	}
 
-	public Set<String> getModuleNamesBySourceFile(String sourceFile) {
+	private Set<String> getModuleNamesBySourceFile(String sourceFile) {
 		Path sourcePath = Paths.get(sourceFile);
 
 		Set<String> result = new HashSet<>();

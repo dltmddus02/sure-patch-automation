@@ -210,7 +210,7 @@ class ModuleSearcherTest {
 
 		// then
 		for (String expectedFile : finalExpectedFiles) {
-			assertTrue(actualSourceFiles.contains(expectedFile), "Missing expected file: " + expectedFile);
+			assertTrue(actualSourceFiles.contains(expectedFile));
 		}
 	}
 

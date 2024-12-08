@@ -39,7 +39,6 @@ public class MacroExtractor {
 			List<String> macroValues = Arrays.stream(macroValue.split("\\s+")).map(String::trim)
 					.filter(s -> !s.isEmpty()).collect(Collectors.toList());
 
-//			checkValidValue(macroValues);
 			macro.setValue(macroValues);
 			return macro;
 		}

@@ -16,7 +16,7 @@ import main.java.model.Module;
 import main.java.util.ValidationUtil;
 
 public class ModuleInfoExtractor {
-
+	// add_executable()
 	public void processAddExecutable(String line, List<Module> modules, String currentPath) {
 		String outputType = "EXE";
 		int startIdx = 1;
@@ -28,6 +28,7 @@ public class ModuleInfoExtractor {
 		}
 	}
 
+	// add_library()
 	public void processAddLibrary(String line, List<Module> modules, String currentPath) {
 		String outputType = line.contains("STATIC") ? "STATIC" : line.contains("SHARED") ? "SHARED" : "X";
 
@@ -37,6 +38,26 @@ public class ModuleInfoExtractor {
 		module = initializeModule(modules, line, currentPath, outputType, startIdx);
 		if (module != null && !isModuleExists(modules, module)) {
 			modules.add(module);
+		}
+	}
+
+	// target_link_libraries()
+	public void processTargetLinkLibraries(String line, Condition condition, List<Module> modules) {
+		String moduleName = ValidationUtil.getModuleName(line);
+		String[] affectedModuleNames = moduleName.split(" ");
+
+		String currentModuleName = affectedModuleNames[0].trim();
+
+		for (String c : condition.getData()) {
+			if (ValidationUtil.isInvalidCondition(c)) {
+				return;
+			}
+			for (Module module : modules) {
+				if (module.getModuleName().equals(currentModuleName)) {
+					processAffectedModules(module, affectedModuleNames, c, modules);
+					return;
+				}
+			}
 		}
 	}
 
@@ -73,6 +94,14 @@ public class ModuleInfoExtractor {
 
 	private String formatPath(String line) {
 		return line.replaceAll("[/\\\\]", "\\\\");
+	}
+
+	private String removeQuotes(String moduleName) {
+		if (moduleName.startsWith("\"")) {
+			return moduleName.substring(1, moduleName.length() - 1);
+		} else {
+			return moduleName;
+		}
 	}
 
 	private String resolvePathForModuleLine(String line, String currentPath) {
@@ -175,31 +204,18 @@ public class ModuleInfoExtractor {
 		return fullPath.substring(baseIndex + baseWord.length() + 1);
 	}
 
-	private String removeQuotes(String moduleName) {
-		if (moduleName.startsWith("\"")) {
-			return moduleName.substring(1, moduleName.length() - 1);
-		} else {
-			return moduleName;
+	private static Module getModuleByModuleName(List<Module> modules, String moduleName) {
+		for (Module module : modules) {
+			if (module.getModuleName().equals(moduleName)) {
+				return module;
+			}
 		}
+		return null;
 	}
 
-	public void processTargetLinkLibraries(String line, Condition condition, List<Module> modules) {
-		String moduleName = ValidationUtil.getModuleName(line);
-		String[] affectedModuleNames = moduleName.split(" ");
-
-		String currentModuleName = affectedModuleNames[0].trim();
-
-		for (String c : condition.getData()) {
-			if (ValidationUtil.isInvalidCondition(c)) {
-				return;
-			}
-			for (Module module : modules) {
-				if (module.getModuleName().equals(currentModuleName)) {
-					processAffectedModules(module, affectedModuleNames, c, modules);
-					return;
-				}
-			}
-		}
+	private static boolean isModuleExists(List<Module> modules, Module newModule) {
+		return modules.stream().anyMatch(existingModule -> existingModule.getModuleName().toString()
+				.equals(newModule.getModuleName().toString()));
 	}
 
 	private void processAffectedModules(Module module, String[] affectedModuleNames, String condition,
@@ -219,17 +235,4 @@ public class ModuleInfoExtractor {
 		}
 	}
 
-	public static Module getModuleByModuleName(List<Module> modules, String moduleName) {
-		for (Module module : modules) {
-			if (module.getModuleName().equals(moduleName)) {
-				return module;
-			}
-		}
-		return null;
-	}
-
-	public static boolean isModuleExists(List<Module> modules, Module newModule) {
-		return modules.stream().anyMatch(existingModule -> existingModule.getModuleName().toString()
-				.equals(newModule.getModuleName().toString()));
-	}
 }

@@ -20,5 +20,4 @@ public class ValidationUtil {
 
 		return moduleName.isEmpty() || moduleName.equals("PRIVATE") || moduleName.equals("PUBLIC") || matcher.matches();
 	}
-
 }

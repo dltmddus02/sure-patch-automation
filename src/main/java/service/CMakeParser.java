@@ -16,19 +16,6 @@ public class CMakeParser {
 		public void parseCMakeFile(CMakeContents root, List<Module> modules) {
 			File cmakeFile = new File(root.getPath() + "\\CMakeLists.txt");
 			recurseProcess(root, cmakeFile, modules);
-
-//			for (Module m : modules) {
-//				System.out.println("모듈이름: " + m.getModuleName());
-//				if (m.getAffectedModules().isEmpty()) {
-//
-//					continue;
-//				}
-//
-//				for (String s : m.getAffectedModules()) {
-//					System.out.println(s);
-//				}
-//				System.out.println("");
-//			}
 		}
 
 		private void recurseProcess(CMakeContents cmakeContents, File cmakeFile, List<Module> modules) {
