@@ -136,8 +136,13 @@ public class ModuleInfoExtractor {
 		 * C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\src\\ut\\COMMON\\
 		 * Args\\Args.cpp -> src\\ut\\COMMON\\Args\\Args.cpp
 		 */
-		validModuleLines
-				.forEach(validLine -> module.addSourceFile(getRelativePath(validLine, "build_engine_GIT_window")));
+
+		for (String moduleLine : validModuleLines) {
+			String formattedModuleLine = getRelativePath(moduleLine, "build_engine_GIT_window");
+			if (isExistSourcePath(formattedModuleLine)) {
+				module.addSourceFile(formattedModuleLine);
+			}
+		}
 	}
 
 	private List<String> hasWildCardPath(String path, String currentPath) {
@@ -202,6 +207,14 @@ public class ModuleInfoExtractor {
 			return fullPath;
 		}
 		return fullPath.substring(baseIndex + baseWord.length() + 1);
+	}
+
+	private boolean isExistSourcePath(String sourcePath) {
+		// 디버깅용
+		// return (Files.exists(Paths.get("C:\\Users\\sure\\CTcode\\build_engine_GIT_window\\" + sourcePath)));
+		
+		// 실제 engine 리포지토리 경로
+		return (Files.exists(Paths.get("C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\" + sourcePath)));
 	}
 
 	private static Module getModuleByModuleName(List<Module> modules, String moduleName) {
