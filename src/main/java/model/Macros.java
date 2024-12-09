@@ -11,6 +11,10 @@ public class Macros {
 		this.data = data;
 	}
 
+	public Stack<List<Macro>> getData() {
+		return data;
+	}
+
 	public void push() {
 		data.add(new ArrayList<>());
 	}

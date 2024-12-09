@@ -57,7 +57,7 @@ class CMakeParserTest {
 
 		String line = "add_library(Foundation SHARED ${SRC_PROJECT} ${HEADER_FILES})";
 		String currentPath = "";
-		
+
 		moduleProcessor.processAddLibrary(line, modules, currentPath);
 
 		String expectedModuleName = "Foundation";
@@ -69,19 +69,6 @@ class CMakeParserTest {
 		assertEquals(expectedModuleName, actualModuleName);
 		assertEquals(expectedModuleType, actualModuleType);
 	}
-
-//	@Test
-//	@DisplayName("static library인 경우 모듈 정보 추출 검증")
-//	void processAddLibrarySTATICTest() {
-//		List<Module> modules = new ArrayList<>();
-//		
-//		String line = "add_library(${PROJECT_NAME} STATIC ${SRC_PROJECT} ${HEADER_FILES})";
-//		String currentPath = "";
-//
-//		moduleProcessor.processAddLibrary(line, modules, currentPath);
-//
-//		assertTrue(modules.isEmpty(), "STATIC 라이브러리는 고려하지 않습니다.");
-//	}
 
 	@Test
 	@DisplayName("Condition if 정보 정상적으로 push되는지 검증")
@@ -134,9 +121,9 @@ class CMakeParserTest {
 		String line = "target_link_libraries(testName PRIVATE -Wl,--start-group cs_common libUTIL_LIB64 PocoFoundationmt ucommon -Wl,--end-group ${CMAKE_DL_LIBS} )";
 
 		Module module = new Module(new StringBuilder("testName"), "EXE");
-		
-	    List<Module> modules = new ArrayList<>();
-	    modules.add(module);
+
+		List<Module> modules = new ArrayList<>();
+		modules.add(module);
 
 		condition.push("UNIX");
 
