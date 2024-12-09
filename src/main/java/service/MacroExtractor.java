@@ -1,25 +1,23 @@
 package main.java.service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import main.java.model.Macro;
 import main.java.model.Macros;
 
 public class MacroExtractor {
 	private MacroReplacer macroReplacer;
+	private Macros macros;
 
 	public MacroExtractor(Macros macros) {
 		macroReplacer = new MacroReplacer(macros);
+		this.macros = macros;
 	}
 
 	public Macro findSetMacro(String line) {
@@ -97,7 +95,7 @@ public class MacroExtractor {
 
 	}
 
-	public Macro findPOCOMacro(String line) {
+	public Macro findPOCOMacro(String line, Macros macros) throws IOException {
 		Pattern setPattern = Pattern.compile("POCO\\w*\\s*\\(\\s*(\\w+)\\s+(.+?)\\s*\\)", Pattern.CASE_INSENSITIVE); // set(매크로명
 
 		line = line.trim();
@@ -114,11 +112,27 @@ public class MacroExtractor {
 			List<String> macroValues = Arrays.stream(macroValue.split("\\s+")).map(String::trim)
 					.filter(s -> !s.isEmpty()).collect(Collectors.toList());
 
+			List<String> existedMacroValues = findMacroValueFromKey(matcher.group(1), macros);
+			macroValues.addAll(existedMacroValues);
+
+			macroValues = resolveMacro(macroValues, "no");
 			macro.setValue(macroValues);
 			return macro;
 		}
 		return null;
 
+	}
+
+	private List<String> findMacroValueFromKey(String key, Macros macros) {
+		List<String> values = new ArrayList<>();
+		List<Macro> currentList = macros.getData().get(macros.getData().size() - 1);
+		for (Macro macro : currentList) {
+			if (macro != null && macro.getKey().equals(key)) {
+				values = macro.getValue();
+				return values;
+			}
+		}
+		return values;
 	}
 
 	public Macro findProjectMacro(String line) {

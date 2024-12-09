@@ -121,8 +121,6 @@ public class CMakePreprocessor {
 		List<String> resultReplaceMacro = new ArrayList<>();
 
 		for (String statement : statements) {
-			resultReplaceMacro.add(macroReplacer.replaceMacro(statement));
-
 			if (CodeLineUtil.isSetStatement(statement)) {
 				macros.add(macroExtractor.findSetMacro(statement));
 			}
@@ -130,7 +128,7 @@ public class CMakePreprocessor {
 				macros.add(macroExtractor.findFileMacro(statement));
 			}
 			if (CodeLineUtil.isPOCOStatement(statement)) {
-				macros.add(macroExtractor.findPOCOMacro(statement));
+				macros.add(macroExtractor.findPOCOMacro(statement, macros));
 			}
 			if (CodeLineUtil.isProjectStatememt(statement)) {
 				macros.add(macroExtractor.findProjectMacro(statement));
@@ -140,6 +138,7 @@ public class CMakePreprocessor {
 				CMakeContents subResult = preprocess(path);
 				result.addChild(subResult);
 			}
+			resultReplaceMacro.add(macroReplacer.replaceMacro(statement));
 		}
 
 		return resultReplaceMacro;

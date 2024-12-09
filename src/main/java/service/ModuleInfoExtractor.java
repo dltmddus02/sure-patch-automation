@@ -138,6 +138,7 @@ public class ModuleInfoExtractor {
 		 */
 
 		for (String moduleLine : validModuleLines) {
+		
 			String formattedModuleLine = getRelativePath(moduleLine, "build_engine_GIT_window");
 			if (isExistSourcePath(formattedModuleLine)) {
 				module.addSourceFile(formattedModuleLine);
@@ -158,7 +159,7 @@ public class ModuleInfoExtractor {
 	}
 
 	private List<String> getRecursiveFilePaths(String path, String currentPath) {
-		String directoryPath = path.substring("GLOB_RECURSE-".length(), path.indexOf("*"));
+		String directoryPath = currentPath + "\\" + path.substring("GLOB_RECURSE-".length(), path.indexOf("*"));
 		List<String> returnMacroValues = new ArrayList<>();
 
 		Path searchPath = getSearchPath(directoryPath, currentPath);
@@ -211,10 +212,10 @@ public class ModuleInfoExtractor {
 
 	private boolean isExistSourcePath(String sourcePath) {
 		// 디버깅용
-		// return (Files.exists(Paths.get("C:\\Users\\sure\\CTcode\\build_engine_GIT_window\\" + sourcePath)));
+		 return (Files.exists(Paths.get("C:\\Users\\sure\\CTcode\\build_engine_GIT_window\\" + sourcePath)));
 		
 		// 실제 engine 리포지토리 경로
-		return (Files.exists(Paths.get("C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\" + sourcePath)));
+//		return (Files.exists(Paths.get("C:\\01.jenkins\\agent\\workspace\\build_engine_GIT_window\\" + sourcePath)));
 	}
 
 	private static Module getModuleByModuleName(List<Module> modules, String moduleName) {
